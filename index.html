@@ -4,11 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fiche de présence</title>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-  .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); max-width: 560px; width: 100%; padding: 2rem 2.5rem; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 1.5rem 1rem; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); max-width: 620px; width: 100%; padding: 2rem 2.5rem; }
   .header { text-align: center; margin-bottom: 1.75rem; }
   .header .logo { width: 56px; height: 56px; background: #1a56db; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
   .header .logo svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2; }
@@ -27,26 +26,38 @@
   .form-group input:focus, .form-group select:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.12); background: #fff; }
   .form-group select:disabled { color: #9ca3af; cursor: not-allowed; }
   .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  /* Google sign-in box */
-  .google-box { background: #f8faff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-  .google-box .google-info { display: flex; align-items: center; gap: 10px; }
-  .google-avatar { width: 36px; height: 36px; border-radius: 50%; background: #dbeafe; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #1e40af; flex-shrink: 0; overflow: hidden; }
-  .google-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .google-name { font-size: 0.9rem; font-weight: 600; color: #1a1a2e; }
-  .google-email { font-size: 0.75rem; color: #6b7280; }
-  .btn-google { display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: #fff; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.85rem; font-weight: 600; color: #374151; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-  .btn-google:hover { background: #f3f4f6; }
-  .btn-google svg { flex-shrink: 0; }
-  .btn-use { padding: 6px 14px; background: #1a56db; color: #fff; border: none; border-radius: 7px; font-size: 0.82rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .btn-use:hover { background: #1648c0; }
-
   .btn { width: 100%; padding: 12px; background: #1a56db; color: #fff; border: none; border-radius: 9px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn:hover { background: #1648c0; }
   .btn:active { transform: scale(0.98); }
   .btn:disabled { background: #93c5fd; cursor: not-allowed; }
   .error-box { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #dc2626; margin-bottom: 12px; }
   .warn-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #92400e; margin-bottom: 14px; display: none; }
+  .hint { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
+  .note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
+  .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Tableau participants */
+  .participants-section { margin-top: 2rem; }
+  .participants-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .participants-header .title { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
+  .participants-header .count-badge { background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .participants-header .btn-refresh { background: none; border: 0.5px solid #d1d5db; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .participants-header .btn-refresh:hover { background: #f3f4f6; }
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #e5e7eb; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  thead tr { background: #1a56db; }
+  thead th { color: #fff; font-weight: 600; padding: 9px 12px; text-align: left; white-space: nowrap; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.15s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f0f6ff; }
+  tbody td { padding: 9px 12px; color: #374151; }
+  tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 40px; }
+  .empty-table { text-align: center; padding: 2rem; color: #9ca3af; font-size: 0.85rem; }
+  .empty-table svg { display: block; margin: 0 auto 8px; opacity: 0.4; }
+  .loading-table { text-align: center; padding: 1.5rem; color: #9ca3af; font-size: 0.85rem; }
+
+  /* Success */
   .success-box { display: none; text-align: center; padding: 2rem 1rem; }
   .success-box .icon { width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
   .success-box h2 { font-size: 1.2rem; color: #065f46; margin-bottom: 0.5rem; }
@@ -54,10 +65,7 @@
   .success-detail { background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-top: 12px; text-align: left; font-size: 0.82rem; color: #6b7280; line-height: 1.8; }
   .success-detail strong { color: #1a1a2e; }
   .btn-new { margin-top: 1rem; padding: 9px 24px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-  .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
-  .hint { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
+
   @media (max-width: 480px) { .card { padding: 1.5rem 1.25rem; } .form-grid-2 { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -76,7 +84,7 @@
     <div class="warn-box" id="warn-formations">Impossible de charger les formations. Vérifiez votre URL Google Script.</div>
     <div class="form-group">
       <label>Formation en ligne suivie <span class="req">*</span></label>
-      <select id="f-formation" disabled>
+      <select id="f-formation" disabled onchange="onFormationChange()">
         <option value="">— Chargement en cours... —</option>
       </select>
       <p class="hint" id="formation-hint">Chargement de la liste depuis Google Sheet...</p>
@@ -89,31 +97,10 @@
     <hr class="separator">
     <p class="section-title">Informations personnelles</p>
 
-    <!-- Suggestion Google -->
-    <div id="google-signin-box" class="google-box">
-      <div class="google-info">
-        <div class="google-avatar" id="google-avatar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <div>
-          <div class="google-name" id="google-name-display">Connexion Google</div>
-          <div class="google-email" id="google-email-display">Cliquez pour utiliser votre nom Google</div>
-        </div>
-      </div>
-      <div id="google-actions">
-        <button class="btn-google" id="btn-google-signin" onclick="signerAvecGoogle()">
-          <svg width="16" height="16" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-          Se connecter avec Google
-        </button>
-      </div>
-    </div>
-
     <div class="form-group">
       <label>Nom et prénoms <span class="req">*</span></label>
       <input type="text" id="f-nom" placeholder="Ex : RAKOTO Jean" autocomplete="name" />
-      <p class="hint" id="nom-hint"></p>
     </div>
-
     <div class="form-grid-2">
       <div class="form-group">
         <label>Région <span class="req">*</span></label>
@@ -137,7 +124,6 @@
         <p class="hint" id="district-hint">Sélectionnez d'abord une région</p>
       </div>
     </div>
-
     <div class="form-group">
       <label>Fonction <span class="req">*</span></label>
       <input type="text" id="f-fonction" placeholder="Ex : Directeur Régional" />
@@ -154,8 +140,40 @@
       <div class="spinner" id="spinner"></div>
     </button>
     <p class="note">* Champs obligatoires — le numéro est attribué automatiquement</p>
+
+    <!-- Tableau participants -->
+    <div class="participants-section" id="participants-section" style="display:none;">
+      <hr class="separator">
+      <div class="participants-header">
+        <span class="title">Participants inscrits</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="count-badge" id="participants-count">0</span>
+          <button class="btn-refresh" onclick="chargerParticipants()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Actualiser
+          </button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>N°</th>
+              <th>Nom et prénoms</th>
+              <th>Formation</th>
+              <th>Région</th>
+              <th>Fonction</th>
+            </tr>
+          </thead>
+          <tbody id="participants-tbody">
+            <tr><td colspan="5" class="loading-table">Sélectionnez une formation pour voir les participants</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
+  <!-- Succès -->
   <div class="success-box" id="success-box">
     <div class="icon">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -180,83 +198,37 @@
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJqfw_zFefMjnc7IDHF7eQxMwvm_8d_OqOy2ahNa7K_M5EnJLWlLHPBynvR3sP3uk/exec";
   // =====================================================
 
-  // =====================================================
-  // REMPLACEZ PAR VOTRE CLIENT ID GOOGLE
-  // (Créez-le sur console.cloud.google.com)
-  // =====================================================
-  const GOOGLE_CLIENT_ID = "VOTRE_CLIENT_ID.apps.googleusercontent.com";
-  // =====================================================
-
-  let googleUserName = "";
-
-  // Initialiser Google Identity
-  window.onload = function() {
-    // Charger les formations
-    chargerFormations();
-
-    // Initialiser Google Sign-In
-    if (typeof google !== 'undefined' && GOOGLE_CLIENT_ID !== "VOTRE_CLIENT_ID.apps.googleusercontent.com") {
-      google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleResponse,
-        auto_select: true,
-        cancel_on_tap_outside: false
-      });
-      google.accounts.id.prompt();
-    }
+  const DISTRICTS = {
+    "Analamanga":       ["Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
+    "Vakinankaratra":   ["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
+    "Itasy":            ["Arivonimamo","Miarinarivo","Soavinandriana"],
+    "Bongolava":        ["Fenoarivobe","Tsiroanomandidy"],
+    "Haute Matsiatra":  ["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
+    "Amoron'i Mania":   ["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
+    "Vatovavy":         ["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
+    "Fitovinany":       ["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
+    "Ihorombe":         ["Ihosy","Ivohibe","Ranohira"],
+    "Atsimo-Atsinanana":["Befotaka","Farafangana","Midongy-Atsimo","Vangaindrano","Vondrozo"],
+    "Atsinanana":       ["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
+    "Analanjirofo":     ["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
+    "Alaotra Mangoro":  ["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
+    "Boeny":            ["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
+    "Sofia":            ["Analalava","Andapa","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
+    "Betsiboka":        ["Kandreho","Maevatanana","Tsaratanana"],
+    "Melaky":           ["Antsalova","Besalampy","Maintirano","Mitsinjo","Morafenobe"],
+    "Atsimo-Andrefana": ["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
+    "Androy":           ["Ambovombe-Androy","Bekily","Beloha","Tsihombe"],
+    "Anosy":            ["Amboasary-Atsimo","Betroka","Taolagnaro"],
+    "Menabe":           ["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
+    "Diana":            ["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
+    "Sava":             ["Andapa","Antalaha","Sambava","Vohimarina"]
   };
 
-  function signerAvecGoogle() {
-    if (GOOGLE_CLIENT_ID === "VOTRE_CLIENT_ID.apps.googleusercontent.com") {
-      document.getElementById('nom-hint').textContent = 'Client ID Google non configuré — saisissez votre nom manuellement.';
-      document.getElementById('f-nom').focus();
-      return;
-    }
-    if (typeof google !== 'undefined') {
-      google.accounts.id.prompt();
-    }
-  }
+  let formationSelectionnee = "";
 
-  function handleGoogleResponse(response) {
-    const payload = parseJwt(response.credential);
-    if (!payload) return;
-
-    googleUserName = payload.name || "";
-    const email    = payload.email || "";
-    const picture  = payload.picture || "";
-
-    // Mettre à jour l'interface
-    document.getElementById('google-name-display').textContent  = googleUserName;
-    document.getElementById('google-email-display').textContent = email;
-
-    const avatarEl = document.getElementById('google-avatar');
-    if (picture) {
-      avatarEl.innerHTML = '<img src="' + picture + '" alt="photo" />';
-    } else {
-      avatarEl.textContent = googleUserName.charAt(0).toUpperCase();
-    }
-
-    // Remplacer le bouton par "Utiliser ce nom"
-    document.getElementById('google-actions').innerHTML =
-      '<button class="btn-use" onclick="utiliserNomGoogle()">Utiliser ce nom</button>';
-
-    // Pré-remplir automatiquement
-    utiliserNomGoogle();
-  }
-
-  function utiliserNomGoogle() {
-    if (googleUserName) {
-      document.getElementById('f-nom').value = googleUserName;
-      document.getElementById('nom-hint').textContent = 'Nom récupéré depuis votre compte Google — modifiable si besoin.';
-    }
-  }
-
-  function parseJwt(token) {
-    try {
-      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-      return JSON.parse(atob(base64));
-    } catch(e) { return null; }
-  }
+  window.addEventListener('load', function() {
+    chargerFormations();
+  });
 
   function chargerFormations() {
     if (GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") {
@@ -291,41 +263,59 @@
       });
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('f-formation').addEventListener('change', function() {
-      const banner = document.getElementById('formation-banner');
-      const text   = document.getElementById('formation-banner-text');
-      if (this.value) { text.textContent = this.value; banner.style.display = 'flex'; }
-      else { banner.style.display = 'none'; }
-    });
-  });
+  function onFormationChange() {
+    const val    = document.getElementById('f-formation').value;
+    const banner = document.getElementById('formation-banner');
+    const text   = document.getElementById('formation-banner-text');
+    const section = document.getElementById('participants-section');
+    if (val) {
+      text.textContent = val;
+      banner.style.display = 'flex';
+      formationSelectionnee = val;
+      section.style.display = 'block';
+      chargerParticipants();
+    } else {
+      banner.style.display = 'none';
+      section.style.display = 'none';
+      formationSelectionnee = '';
+    }
+  }
+
+  function chargerParticipants() {
+    if (!formationSelectionnee || GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") return;
+    const tbody = document.getElementById('participants-tbody');
+    tbody.innerHTML = '<tr><td colspan="5" class="loading-table">Chargement...</td></tr>';
+    const params = new URLSearchParams({ action: 'getParticipants', formation: formationSelectionnee });
+    fetch(GOOGLE_SCRIPT_URL + '?' + params.toString())
+      .then(r => r.json())
+      .then(data => {
+        if (data.status === 'success' && data.participants && data.participants.length > 0) {
+          document.getElementById('participants-count').textContent = data.participants.length;
+          tbody.innerHTML = data.participants.map(p =>
+            '<tr>' +
+            '<td>' + escHtml(p.numero) + '</td>' +
+            '<td>' + escHtml(p.nom) + '</td>' +
+            '<td>' + escHtml(p.formation) + '</td>' +
+            '<td>' + escHtml(p.region) + '</td>' +
+            '<td>' + escHtml(p.fonction) + '</td>' +
+            '</tr>'
+          ).join('');
+        } else {
+          document.getElementById('participants-count').textContent = '0';
+          tbody.innerHTML = '<tr><td colspan="5" class="empty-table"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Aucun participant inscrit pour cette formation</td></tr>';
+        }
+      })
+      .catch(() => {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-table">Erreur de chargement</td></tr>';
+      });
+  }
+
+  function escHtml(t) {
+    if (!t) return '';
+    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
 
   function chargerDistricts() {
-    const DISTRICTS = {
-      "Analamanga":       ["Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
-      "Vakinankaratra":   ["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
-      "Itasy":            ["Arivonimamo","Miarinarivo","Soavinandriana"],
-      "Bongolava":        ["Fenoarivobe","Tsiroanomandidy"],
-      "Haute Matsiatra":  ["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
-      "Amoron'i Mania":   ["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
-      "Vatovavy":         ["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
-      "Fitovinany":       ["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
-      "Ihorombe":         ["Ihosy","Ivohibe","Ranohira"],
-      "Atsimo-Atsinanana":["Befotaka","Farafangana","Midongy-Atsimo","Vangaindrano","Vondrozo"],
-      "Atsinanana":       ["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
-      "Analanjirofo":     ["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
-      "Alaotra Mangoro":  ["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
-      "Boeny":            ["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
-      "Sofia":            ["Analalava","Andapa","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
-      "Betsiboka":        ["Kandreho","Maevatanana","Tsaratanana"],
-      "Melaky":           ["Antsalova","Besalampy","Maintirano","Mitsinjo","Morafenobe"],
-      "Atsimo-Andrefana": ["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
-      "Androy":           ["Ambovombe-Androy","Bekily","Beloha","Tsihombe"],
-      "Anosy":            ["Amboasary-Atsimo","Betroka","Taolagnaro"],
-      "Menabe":           ["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
-      "Diana":            ["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
-      "Sava":             ["Andapa","Antalaha","Sambava","Vohimarina"]
-    };
     const region = document.getElementById('f-region').value;
     const sel    = document.getElementById('f-district');
     const hint   = document.getElementById('district-hint');
@@ -388,13 +378,14 @@
     document.getElementById('btn-label').textContent = 'Enregistrer ma présence';
     document.getElementById('spinner').style.display = 'none';
     document.getElementById('formation-banner').style.display = 'none';
+    document.getElementById('participants-section').style.display = 'none';
     ['f-nom','f-fonction','f-mvola'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('f-formation').value = '';
     document.getElementById('f-region').value = '';
     document.getElementById('f-district').innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
     document.getElementById('f-district').disabled = true;
     document.getElementById('district-hint').textContent = 'Sélectionnez d\'abord une région';
-    document.getElementById('nom-hint').textContent = '';
+    formationSelectionnee = '';
   }
 </script>
 </body>
