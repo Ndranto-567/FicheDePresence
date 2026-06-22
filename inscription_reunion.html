@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche de présence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    max-width: 560px;
+    width: 100%;
+    padding: 2rem 2.5rem;
+  }
+  .header { text-align: center; margin-bottom: 1.75rem; }
+  .header .logo {
+    width: 56px; height: 56px;
+    background: #1a56db;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+  .header .logo svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2; }
+  .header h1 { font-size: 1.35rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.25rem; }
+  .header p { font-size: 0.875rem; color: #6b7280; }
+
+  .formation-banner {
+    background: #eff6ff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .formation-banner svg { flex-shrink: 0; margin-top: 1px; }
+  .formation-banner .label { font-size: 0.75rem; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+  .formation-banner .value { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
+  .formation-banner .loading { font-size: 0.85rem; color: #6b7280; font-style: italic; }
+
+  .separator {
+    border: none;
+    border-top: 1.5px dashed #e5e7eb;
+    margin: 18px 0;
+  }
+  .section-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 14px;
+  }
+
+  .form-row { display: grid; grid-template-columns: 90px 1fr; gap: 12px; margin-bottom: 14px; }
+  .form-group { margin-bottom: 14px; }
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .form-group label .req { color: #e53e3e; margin-left: 2px; }
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px 13px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #1a1a2e;
+    background: #f9fafb;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    appearance: auto;
+  }
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #1a56db;
+    box-shadow: 0 0 0 3px rgba(26,86,219,0.12);
+    background: #fff;
+  }
+  .form-group select:disabled { color: #9ca3af; cursor: not-allowed; }
+  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .btn {
+    width: 100%;
+    padding: 12px;
+    background: #1a56db;
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn:hover { background: #1648c0; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { background: #93c5fd; cursor: not-allowed; }
+
+  .error-box {
+    display: none;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #dc2626;
+    margin-bottom: 12px;
+  }
+  .warn-box {
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: #92400e;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .success-box { display: none; text-align: center; padding: 2rem 1rem; }
+  .success-box .icon {
+    width: 64px; height: 64px;
+    background: #ecfdf5;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  .success-box h2 { font-size: 1.2rem; color: #065f46; margin-bottom: 0.5rem; }
+  .success-box p { font-size: 0.9rem; color: #6b7280; }
+  .success-box .name-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 20px;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+  }
+  .success-detail {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    text-align: left;
+    font-size: 0.82rem;
+    color: #6b7280;
+    line-height: 1.8;
+  }
+  .success-detail strong { color: #1a1a2e; }
+  .btn-new {
+    margin-top: 1rem;
+    padding: 9px 24px;
+    background: #f3f4f6;
+    color: #374151;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .spinner {
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
+  .hint { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
+
+  @media (max-width: 480px) {
+    .card { padding: 1.5rem 1.25rem; }
+    .form-grid-2 { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="logo">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <h1>Fiche de présence</h1>
+    <p>Veuillez renseigner vos informations avant d'entrer</p>
+  </div>
+
+  <div id="form-section">
+
+    <!-- Formation sélectionnée -->
+    <p class="section-title">Formation suivie</p>
+    <div class="warn-box" id="warn-formations">
+      Impossible de charger les formations. Vérifiez votre URL Google Script.
+    </div>
+    <div class="form-group">
+      <label>Formation en ligne suivie <span class="req">*</span></label>
+      <select id="f-formation" disabled>
+        <option value="">— Chargement en cours... —</option>
+      </select>
+      <p class="hint" id="formation-hint">Chargement de la liste depuis Google Sheet...</p>
+    </div>
+
+    <!-- Bannière formation choisie -->
+    <div class="formation-banner" id="formation-banner" style="display:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      <div>
+        <div class="label">Formation sélectionnée</div>
+        <div class="value" id="formation-banner-text"></div>
+      </div>
+    </div>
+
+    <hr class="separator">
+
+    <!-- Informations personnelles -->
+    <p class="section-title">Informations personnelles</p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>N° <span class="req">*</span></label>
+        <input type="number" id="f-num" placeholder="001" min="1" />
+      </div>
+      <div class="form-group">
+        <label>Nom et prénoms <span class="req">*</span></label>
+        <input type="text" id="f-nom" placeholder="Ex : RAKOTO Jean" />
+      </div>
+    </div>
+
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>Région <span class="req">*</span></label>
+        <select id="f-region" onchange="chargerDistricts()">
+          <option value="">— Choisir —</option>
+          <option>Analamanga</option><option>Vakinankaratra</option><option>Itasy</option>
+          <option>Bongolava</option><option>Haute Matsiatra</option><option>Amoron'i Mania</option>
+          <option>Vatovavy</option><option>Fitovinany</option><option>Ihorombe</option>
+          <option>Atsimo-Atsinanana</option><option>Atsinanana</option><option>Analanjirofo</option>
+          <option>Alaotra Mangoro</option><option>Boeny</option><option>Sofia</option>
+          <option>Betsiboka</option><option>Melaky</option><option>Atsimo-Andrefana</option>
+          <option>Androy</option><option>Anosy</option><option>Menabe</option>
+          <option>Diana</option><option>Sava</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>District <span class="req">*</span></label>
+        <select id="f-district" disabled>
+          <option value="">— Choisir la région —</option>
+        </select>
+        <p class="hint" id="district-hint">Sélectionnez d'abord une région</p>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Fonction <span class="req">*</span></label>
+      <input type="text" id="f-fonction" placeholder="Ex : Directeur Régional" />
+    </div>
+
+    <div class="form-group">
+      <label>N° Mvola et CIN <span class="req">*</span></label>
+      <input type="text" id="f-mvola" placeholder="Ex : 034 XX XXX XX / CIN 123456789" />
+    </div>
+
+    <div class="error-box" id="error-box"></div>
+
+    <button class="btn" id="btn-submit" onclick="soumettre()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span id="btn-label">Enregistrer ma présence</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+    <p class="note">* Champs obligatoires — vos données sont enregistrées de façon sécurisée</p>
+  </div>
+
+  <!-- Écran de succès -->
+  <div class="success-box" id="success-box">
+    <div class="icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <h2>Présence enregistrée !</h2>
+    <div class="name-badge" id="success-name"></div>
+    <p>Vos informations ont été sauvegardées dans Google Sheet.</p>
+    <div class="success-detail">
+      <div>Formation : <strong id="s-formation"></strong></div>
+      <div>Région : <strong id="s-region"></strong></div>
+      <div>District : <strong id="s-district"></strong></div>
+      <div>Fonction : <strong id="s-fonction"></strong></div>
+    </div>
+    <button class="btn-new" onclick="nouveau()">+ Nouvelle inscription</button>
+  </div>
+</div>
+
+<script>
+  // =====================================================
+  // REMPLACEZ CETTE URL PAR VOTRE URL GOOGLE APPS SCRIPT
+  // =====================================================
+  const GOOGLE_SCRIPT_URL = "VOTRE_URL_ICI";
+  // =====================================================
+
+  const DISTRICTS = {
+    "Analamanga":       ["Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
+    "Vakinankaratra":   ["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
+    "Itasy":            ["Arivonimamo","Miarinarivo","Soavinandriana"],
+    "Bongolava":        ["Fenoarivobe","Tsiroanomandidy"],
+    "Haute Matsiatra":  ["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
+    "Amoron'i Mania":   ["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
+    "Vatovavy":         ["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
+    "Fitovinany":       ["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
+    "Ihorombe":         ["Ihosy","Ivohibe","Ranohira"],
+    "Atsimo-Atsinanana":["Befotaka","Farafangana","Midongy-Atsimo","Vangaindrano","Vondrozo"],
+    "Atsinanana":       ["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
+    "Analanjirofo":     ["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
+    "Alaotra Mangoro":  ["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
+    "Boeny":            ["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
+    "Sofia":            ["Analalava","Andapa","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
+    "Betsiboka":        ["Kandreho","Maevatanana","Tsaratanana"],
+    "Melaky":           ["Antsalova","Besalampy","Maintirano","Mitsinjo","Morafenobe"],
+    "Atsimo-Andrefana": ["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
+    "Androy":           ["Ambovombe-Androy","Bekily","Beloha","Tsihombe"],
+    "Anosy":            ["Amboasary-Atsimo","Betroka","Taolagnaro"],
+    "Menabe":           ["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
+    "Diana":            ["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
+    "Sava":             ["Andapa","Antalaha","Sambava","Vohimarina"]
+  };
+
+  // Chargement des formations au démarrage
+  window.addEventListener('load', function() {
+    if (GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") {
+      document.getElementById('warn-formations').style.display = 'block';
+      document.getElementById('f-formation').innerHTML = '<option value="">— URL non configurée —</option>';
+      document.getElementById('formation-hint').textContent = 'Configurez GOOGLE_SCRIPT_URL dans le fichier HTML';
+      return;
+    }
+    fetch(GOOGLE_SCRIPT_URL + '?action=getFormations')
+      .then(r => r.json())
+      .then(data => {
+        const sel  = document.getElementById('f-formation');
+        const hint = document.getElementById('formation-hint');
+        if (data.status === 'success' && data.formations.length > 0) {
+          sel.innerHTML = '<option value="">— Choisir la formation —</option>';
+          data.formations.forEach(f => {
+            const opt = document.createElement('option');
+            opt.value = f; opt.textContent = f;
+            sel.appendChild(opt);
+          });
+          sel.disabled = false;
+          hint.textContent = data.formations.length + ' formation(s) disponible(s)';
+        } else {
+          sel.innerHTML = '<option value="">— Aucune formation trouvée —</option>';
+          hint.textContent = 'Ajoutez des formations dans l\'onglet "Formations" du Google Sheet';
+          document.getElementById('warn-formations').style.display = 'block';
+        }
+      })
+      .catch(() => {
+        document.getElementById('f-formation').innerHTML = '<option value="">— Erreur de chargement —</option>';
+        document.getElementById('warn-formations').style.display = 'block';
+        document.getElementById('formation-hint').textContent = 'Vérifiez votre URL Google Script';
+      });
+  });
+
+  // Afficher la bannière quand une formation est choisie
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('f-formation').addEventListener('change', function() {
+      const banner = document.getElementById('formation-banner');
+      const text   = document.getElementById('formation-banner-text');
+      if (this.value) {
+        text.textContent = this.value;
+        banner.style.display = 'flex';
+      } else {
+        banner.style.display = 'none';
+      }
+    });
+  });
+
+  function chargerDistricts() {
+    const region = document.getElementById('f-region').value;
+    const sel    = document.getElementById('f-district');
+    const hint   = document.getElementById('district-hint');
+    sel.innerHTML = '';
+    if (!region) {
+      sel.disabled = true;
+      sel.innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
+      hint.textContent = 'Sélectionnez d\'abord une région';
+      return;
+    }
+    const districts = DISTRICTS[region] || [];
+    sel.disabled = false;
+    sel.innerHTML = '<option value="">— Choisir le district —</option>';
+    districts.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      sel.appendChild(opt);
+    });
+    hint.textContent = districts.length + ' district(s) disponible(s)';
+  }
+
+  function soumettre() {
+    const formation = document.getElementById('f-formation').value;
+    const num       = document.getElementById('f-num').value.trim();
+    const nom       = document.getElementById('f-nom').value.trim();
+    const region    = document.getElementById('f-region').value;
+    const district  = document.getElementById('f-district').value;
+    const fonction  = document.getElementById('f-fonction').value.trim();
+    const mvola     = document.getElementById('f-mvola').value.trim();
+    const errBox    = document.getElementById('error-box');
+
+    if (!formation || !num || !nom || !region || !district || !fonction || !mvola) {
+      errBox.style.display = 'block';
+      errBox.textContent = 'Veuillez remplir tous les champs obligatoires.';
+      return;
+    }
+    errBox.style.display = 'none';
+
+    const btn     = document.getElementById('btn-submit');
+    const label   = document.getElementById('btn-label');
+    const spinner = document.getElementById('spinner');
+    btn.disabled  = true;
+    label.textContent = 'Enregistrement...';
+    spinner.style.display = 'block';
+
+    const now      = new Date();
+    const dateHeure = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
+    const params   = new URLSearchParams({ action:'enregistrer', numero:num, formation, nom, region, district, fonction, mvola, date_heure:dateHeure });
+
+    fetch(GOOGLE_SCRIPT_URL + '?' + params.toString(), { method:'GET', mode:'no-cors' })
+      .then(() => {
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('success-box').style.display  = 'block';
+        document.getElementById('success-name').textContent   = nom;
+        document.getElementById('s-formation').textContent    = formation;
+        document.getElementById('s-region').textContent       = region;
+        document.getElementById('s-district').textContent     = district;
+        document.getElementById('s-fonction').textContent     = fonction;
+      })
+      .catch(() => {
+        errBox.style.display = 'block';
+        errBox.textContent   = 'Erreur de connexion. Vérifiez votre URL Google Script.';
+        btn.disabled         = false;
+        label.textContent    = 'Enregistrer ma présence';
+        spinner.style.display = 'none';
+      });
+  }
+
+  function nouveau() {
+    document.getElementById('success-box').style.display  = 'none';
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('btn-submit').disabled        = false;
+    document.getElementById('btn-label').textContent      = 'Enregistrer ma présence';
+    document.getElementById('spinner').style.display      = 'none';
+    document.getElementById('formation-banner').style.display = 'none';
+    ['f-num','f-nom','f-fonction','f-mvola'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('f-formation').value = '';
+    document.getElementById('f-region').value    = '';
+    document.getElementById('f-district').innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
+    document.getElementById('f-district').disabled  = true;
+    document.getElementById('district-hint').textContent = 'Sélectionnez d\'abord une région';
+  }
+</script>
+</body>
+</html>
