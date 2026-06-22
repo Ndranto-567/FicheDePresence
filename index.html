@@ -7,7 +7,7 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 1.5rem 1rem; }
-  .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); max-width: 620px; width: 100%; padding: 2rem 2.5rem; }
+  .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); max-width: 640px; width: 100%; padding: 2rem 2.5rem; }
   .header { text-align: center; margin-bottom: 1.75rem; }
   .header .logo { width: 56px; height: 56px; background: #1a56db; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
   .header .logo svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2; }
@@ -22,7 +22,7 @@
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
   .form-group label .req { color: #e53e3e; margin-left: 2px; }
-  .form-group input, .form-group select { width: 100%; padding: 10px 13px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; color: #1a1a2e; background: #f9fafb; transition: border-color 0.2s, box-shadow 0.2s; outline: none; appearance: auto; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 13px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; color: #1a1a2e; background: #f9fafb; transition: border-color 0.2s; outline: none; appearance: auto; }
   .form-group input:focus, .form-group select:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.12); background: #fff; }
   .form-group select:disabled { color: #9ca3af; cursor: not-allowed; }
   .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -36,36 +36,31 @@
   .note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
   .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Tableau participants */
-  .participants-section { margin-top: 2rem; }
-  .participants-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .participants-header .title { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
-  .participants-header .count-badge { background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-  .participants-header .btn-refresh { background: none; border: 0.5px solid #d1d5db; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-  .participants-header .btn-refresh:hover { background: #f3f4f6; }
+  .participants-section { margin-top: 1.5rem; }
+  .participants-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .participants-header .ptitle { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
+  .count-badge { background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+  .btn-refresh { background: none; border: 0.5px solid #d1d5db; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+  .btn-refresh:hover { background: #f3f4f6; }
   .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #e5e7eb; }
   table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
   thead tr { background: #1a56db; }
   thead th { color: #fff; font-weight: 600; padding: 9px 12px; text-align: left; white-space: nowrap; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
-  tbody tr { border-bottom: 1px solid #f3f4f6; transition: background 0.15s; }
+  tbody tr { border-bottom: 1px solid #f3f4f6; }
   tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: #f0f6ff; }
+  tbody tr:nth-child(even) { background: #f8faff; }
+  tbody tr:hover { background: #eff6ff; }
   tbody td { padding: 9px 12px; color: #374151; }
-  tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 40px; }
-  .empty-table { text-align: center; padding: 2rem; color: #9ca3af; font-size: 0.85rem; }
-  .empty-table svg { display: block; margin: 0 auto 8px; opacity: 0.4; }
-  .loading-table { text-align: center; padding: 1.5rem; color: #9ca3af; font-size: 0.85rem; }
-
-  /* Success */
+  tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 44px; }
+  .table-msg { text-align: center; padding: 1.5rem; color: #9ca3af; font-size: 0.85rem; }
   .success-box { display: none; text-align: center; padding: 2rem 1rem; }
   .success-box .icon { width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
   .success-box h2 { font-size: 1.2rem; color: #065f46; margin-bottom: 0.5rem; }
   .success-box .name-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin: 0.5rem 0; font-size: 1rem; }
-  .success-detail { background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-top: 12px; text-align: left; font-size: 0.82rem; color: #6b7280; line-height: 1.8; }
+  .numero-badge { display: inline-block; background: #f0fdf4; color: #166534; font-weight: 700; padding: 3px 12px; border-radius: 20px; font-size: 0.85rem; border: 1px solid #bbf7d0; margin-left: 6px; }
+  .success-detail { background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-top: 12px; text-align: left; font-size: 0.82rem; color: #6b7280; line-height: 1.9; }
   .success-detail strong { color: #1a1a2e; }
   .btn-new { margin-top: 1rem; padding: 9px 24px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-
   @media (max-width: 480px) { .card { padding: 1.5rem 1.25rem; } .form-grid-2 { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -96,7 +91,6 @@
 
     <hr class="separator">
     <p class="section-title">Informations personnelles</p>
-
     <div class="form-group">
       <label>Nom et prénoms <span class="req">*</span></label>
       <input type="text" id="f-nom" placeholder="Ex : RAKOTO Jean" autocomplete="name" />
@@ -145,8 +139,8 @@
     <div class="participants-section" id="participants-section" style="display:none;">
       <hr class="separator">
       <div class="participants-header">
-        <span class="title">Participants inscrits</span>
-        <div style="display:flex; align-items:center; gap:8px;">
+        <span class="ptitle">Participants inscrits</span>
+        <div style="display:flex;align-items:center;gap:8px;">
           <span class="count-badge" id="participants-count">0</span>
           <button class="btn-refresh" onclick="chargerParticipants()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
@@ -157,30 +151,26 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr>
-              <th>N°</th>
-              <th>Nom et prénoms</th>
-              <th>Formation</th>
-              <th>Région</th>
-              <th>Fonction</th>
-            </tr>
+            <tr><th>N°</th><th>Nom et prénoms</th><th>Formation</th><th>Région</th><th>Fonction</th></tr>
           </thead>
           <tbody id="participants-tbody">
-            <tr><td colspan="5" class="loading-table">Sélectionnez une formation pour voir les participants</td></tr>
+            <tr><td colspan="5" class="table-msg">Sélectionnez une formation pour voir les participants</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- Succès -->
   <div class="success-box" id="success-box">
     <div class="icon">
       <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
     <h2>Présence enregistrée !</h2>
-    <div class="name-badge" id="success-name"></div>
-    <p>Vos informations ont été sauvegardées dans Google Sheet.</p>
+    <div>
+      <span class="name-badge" id="success-name"></span>
+      <span class="numero-badge" id="success-numero"></span>
+    </div>
+    <p style="margin-top:8px;">Vos informations ont été sauvegardées dans Google Sheet.</p>
     <div class="success-detail">
       <div>Formation : <strong id="s-formation"></strong></div>
       <div>Région : <strong id="s-region"></strong></div>
@@ -199,36 +189,53 @@
   // =====================================================
 
   const DISTRICTS = {
-    "Analamanga":       ["Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
-    "Vakinankaratra":   ["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
-    "Itasy":            ["Arivonimamo","Miarinarivo","Soavinandriana"],
-    "Bongolava":        ["Fenoarivobe","Tsiroanomandidy"],
-    "Haute Matsiatra":  ["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
-    "Amoron'i Mania":   ["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
-    "Vatovavy":         ["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
-    "Fitovinany":       ["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
-    "Ihorombe":         ["Ihosy","Ivohibe","Ranohira"],
+    "Analamanga":["Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
+    "Vakinankaratra":["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
+    "Itasy":["Arivonimamo","Miarinarivo","Soavinandriana"],
+    "Bongolava":["Fenoarivobe","Tsiroanomandidy"],
+    "Haute Matsiatra":["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
+    "Amoron'i Mania":["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
+    "Vatovavy":["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
+    "Fitovinany":["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
+    "Ihorombe":["Ihosy","Ivohibe","Ranohira"],
     "Atsimo-Atsinanana":["Befotaka","Farafangana","Midongy-Atsimo","Vangaindrano","Vondrozo"],
-    "Atsinanana":       ["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
-    "Analanjirofo":     ["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
-    "Alaotra Mangoro":  ["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
-    "Boeny":            ["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
-    "Sofia":            ["Analalava","Andapa","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
-    "Betsiboka":        ["Kandreho","Maevatanana","Tsaratanana"],
-    "Melaky":           ["Antsalova","Besalampy","Maintirano","Mitsinjo","Morafenobe"],
-    "Atsimo-Andrefana": ["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
-    "Androy":           ["Ambovombe-Androy","Bekily","Beloha","Tsihombe"],
-    "Anosy":            ["Amboasary-Atsimo","Betroka","Taolagnaro"],
-    "Menabe":           ["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
-    "Diana":            ["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
-    "Sava":             ["Andapa","Antalaha","Sambava","Vohimarina"]
+    "Atsinanana":["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
+    "Analanjirofo":["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
+    "Alaotra Mangoro":["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
+    "Boeny":["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
+    "Sofia":["Analalava","Andapa","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
+    "Betsiboka":["Kandreho","Maevatanana","Tsaratanana"],
+    "Melaky":["Antsalova","Besalampy","Maintirano","Mitsinjo","Morafenobe"],
+    "Atsimo-Andrefana":["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
+    "Androy":["Ambovombe-Androy","Bekily","Beloha","Tsihombe"],
+    "Anosy":["Amboasary-Atsimo","Betroka","Taolagnaro"],
+    "Menabe":["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
+    "Diana":["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
+    "Sava":["Andapa","Antalaha","Sambava","Vohimarina"]
   };
 
   let formationSelectionnee = "";
+  let cbCounter = 0;
 
-  window.addEventListener('load', function() {
-    chargerFormations();
-  });
+  // Appel JSONP — contourne le CORS de Google Apps Script
+  function jsonp(url, callback) {
+    const cbName = 'cb_' + (++cbCounter);
+    window[cbName] = function(data) {
+      delete window[cbName];
+      document.head.removeChild(script);
+      callback(data);
+    };
+    const script = document.createElement('script');
+    script.src = url + '&callback=' + cbName;
+    script.onerror = function() {
+      delete window[cbName];
+      document.head.removeChild(script);
+      callback(null);
+    };
+    document.head.appendChild(script);
+  }
+
+  window.addEventListener('load', function() { chargerFormations(); });
 
   function chargerFormations() {
     if (GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") {
@@ -237,39 +244,28 @@
       document.getElementById('formation-hint').textContent = 'Configurez GOOGLE_SCRIPT_URL dans le fichier HTML';
       return;
     }
-    fetch(GOOGLE_SCRIPT_URL + '?action=getFormations')
-      .then(r => r.json())
-      .then(data => {
-        const sel  = document.getElementById('f-formation');
-        const hint = document.getElementById('formation-hint');
-        if (data.status === 'success' && data.formations.length > 0) {
-          sel.innerHTML = '<option value="">— Choisir la formation —</option>';
-          data.formations.forEach(f => {
-            const opt = document.createElement('option');
-            opt.value = f; opt.textContent = f; sel.appendChild(opt);
-          });
-          sel.disabled = false;
-          hint.textContent = data.formations.length + ' formation(s) disponible(s)';
-        } else {
-          sel.innerHTML = '<option value="">— Aucune formation trouvée —</option>';
-          hint.textContent = 'Ajoutez des formations dans l\'onglet "Formations" du Google Sheet';
-          document.getElementById('warn-formations').style.display = 'block';
-        }
-      })
-      .catch(() => {
-        document.getElementById('f-formation').innerHTML = '<option value="">— Erreur de chargement —</option>';
+    jsonp(GOOGLE_SCRIPT_URL + '?action=getFormations', function(data) {
+      const sel  = document.getElementById('f-formation');
+      const hint = document.getElementById('formation-hint');
+      if (data && data.status === 'success' && data.formations.length > 0) {
+        sel.innerHTML = '<option value="">— Choisir la formation —</option>';
+        data.formations.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
+        sel.disabled = false;
+        hint.textContent = data.formations.length + ' formation(s) disponible(s)';
+      } else {
+        sel.innerHTML = '<option value="">— Aucune formation trouvée —</option>';
+        hint.textContent = 'Ajoutez des formations dans l\'onglet "Formations" du Google Sheet';
         document.getElementById('warn-formations').style.display = 'block';
-        document.getElementById('formation-hint').textContent = 'Vérifiez votre URL Google Script';
-      });
+      }
+    });
   }
 
   function onFormationChange() {
-    const val    = document.getElementById('f-formation').value;
-    const banner = document.getElementById('formation-banner');
-    const text   = document.getElementById('formation-banner-text');
+    const val     = document.getElementById('f-formation').value;
+    const banner  = document.getElementById('formation-banner');
     const section = document.getElementById('participants-section');
     if (val) {
-      text.textContent = val;
+      document.getElementById('formation-banner-text').textContent = val;
       banner.style.display = 'flex';
       formationSelectionnee = val;
       section.style.display = 'block';
@@ -284,48 +280,29 @@
   function chargerParticipants() {
     if (!formationSelectionnee || GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") return;
     const tbody = document.getElementById('participants-tbody');
-    tbody.innerHTML = '<tr><td colspan="5" class="loading-table">Chargement...</td></tr>';
-    const params = new URLSearchParams({ action: 'getParticipants', formation: formationSelectionnee });
-    fetch(GOOGLE_SCRIPT_URL + '?' + params.toString())
-      .then(r => r.json())
-      .then(data => {
-        if (data.status === 'success' && data.participants && data.participants.length > 0) {
-          document.getElementById('participants-count').textContent = data.participants.length;
-          tbody.innerHTML = data.participants.map(p =>
-            '<tr>' +
-            '<td>' + escHtml(p.numero) + '</td>' +
-            '<td>' + escHtml(p.nom) + '</td>' +
-            '<td>' + escHtml(p.formation) + '</td>' +
-            '<td>' + escHtml(p.region) + '</td>' +
-            '<td>' + escHtml(p.fonction) + '</td>' +
-            '</tr>'
-          ).join('');
-        } else {
-          document.getElementById('participants-count').textContent = '0';
-          tbody.innerHTML = '<tr><td colspan="5" class="empty-table"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Aucun participant inscrit pour cette formation</td></tr>';
-        }
-      })
-      .catch(() => {
-        tbody.innerHTML = '<tr><td colspan="5" class="empty-table">Erreur de chargement</td></tr>';
-      });
+    tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Chargement...</td></tr>';
+    const url = GOOGLE_SCRIPT_URL + '?action=getParticipants&formation=' + encodeURIComponent(formationSelectionnee);
+    jsonp(url, function(data) {
+      if (data && data.status === 'success' && data.participants && data.participants.length > 0) {
+        document.getElementById('participants-count').textContent = data.participants.length;
+        tbody.innerHTML = data.participants.map(p =>
+          '<tr><td>' + esc(p.numero) + '</td><td>' + esc(p.nom) + '</td><td>' + esc(p.formation) + '</td><td>' + esc(p.region) + '</td><td>' + esc(p.fonction) + '</td></tr>'
+        ).join('');
+      } else {
+        document.getElementById('participants-count').textContent = '0';
+        tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Aucun participant inscrit pour cette formation</td></tr>';
+      }
+    });
   }
 
-  function escHtml(t) {
-    if (!t) return '';
-    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
+  function esc(t) { return t ? String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 
   function chargerDistricts() {
     const region = document.getElementById('f-region').value;
     const sel    = document.getElementById('f-district');
     const hint   = document.getElementById('district-hint');
     sel.innerHTML = '';
-    if (!region) {
-      sel.disabled = true;
-      sel.innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
-      hint.textContent = 'Sélectionnez d\'abord une région';
-      return;
-    }
+    if (!region) { sel.disabled = true; sel.innerHTML = '<option value="">— Choisir la région d\'abord —</option>'; hint.textContent = 'Sélectionnez d\'abord une région'; return; }
     const districts = DISTRICTS[region] || [];
     sel.disabled = false;
     sel.innerHTML = '<option value="">— Choisir le district —</option>';
@@ -342,9 +319,7 @@
     const mvola     = document.getElementById('f-mvola').value.trim();
     const errBox    = document.getElementById('error-box');
     if (!formation || !nom || !region || !district || !fonction || !mvola) {
-      errBox.style.display = 'block';
-      errBox.textContent = 'Veuillez remplir tous les champs obligatoires.';
-      return;
+      errBox.style.display = 'block'; errBox.textContent = 'Veuillez remplir tous les champs obligatoires.'; return;
     }
     errBox.style.display = 'none';
     const btn = document.getElementById('btn-submit');
@@ -353,32 +328,33 @@
     btn.disabled = true; label.textContent = 'Enregistrement...'; spinner.style.display = 'block';
     const now = new Date();
     const dateHeure = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-    const params = new URLSearchParams({ action:'enregistrer', formation, nom, region, district, fonction, mvola, date_heure: dateHeure });
-    fetch(GOOGLE_SCRIPT_URL + '?' + params.toString(), { method:'GET', mode:'no-cors' })
-      .then(() => {
+    const url = GOOGLE_SCRIPT_URL + '?action=enregistrer&formation=' + encodeURIComponent(formation) +
+      '&nom=' + encodeURIComponent(nom) + '&region=' + encodeURIComponent(region) +
+      '&district=' + encodeURIComponent(district) + '&fonction=' + encodeURIComponent(fonction) +
+      '&mvola=' + encodeURIComponent(mvola) + '&date_heure=' + encodeURIComponent(dateHeure);
+    jsonp(url, function(data) {
+      btn.disabled = false; label.textContent = 'Enregistrer ma présence'; spinner.style.display = 'none';
+      if (data && data.status === 'success') {
         document.getElementById('form-section').style.display = 'none';
         document.getElementById('success-box').style.display  = 'block';
         document.getElementById('success-name').textContent   = nom;
+        document.getElementById('success-numero').textContent = 'N° ' + (data.numero || '');
         document.getElementById('s-formation').textContent    = formation;
         document.getElementById('s-region').textContent       = region;
         document.getElementById('s-district').textContent     = district;
         document.getElementById('s-fonction').textContent     = fonction;
-      })
-      .catch(() => {
+      } else {
         errBox.style.display = 'block';
-        errBox.textContent = 'Erreur de connexion. Vérifiez votre URL Google Script.';
-        btn.disabled = false; label.textContent = 'Enregistrer ma présence'; spinner.style.display = 'none';
-      });
+        errBox.textContent = 'Erreur d\'enregistrement. Vérifiez votre URL Google Script.';
+      }
+    });
   }
 
   function nouveau() {
     document.getElementById('success-box').style.display  = 'none';
     document.getElementById('form-section').style.display = 'block';
-    document.getElementById('btn-submit').disabled = false;
-    document.getElementById('btn-label').textContent = 'Enregistrer ma présence';
-    document.getElementById('spinner').style.display = 'none';
-    document.getElementById('formation-banner').style.display = 'none';
     document.getElementById('participants-section').style.display = 'none';
+    document.getElementById('formation-banner').style.display = 'none';
     ['f-nom','f-fonction','f-mvola'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('f-formation').value = '';
     document.getElementById('f-region').value = '';
