@@ -26,16 +26,29 @@
   .form-group input:focus, .form-group select:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.12); background: #fff; }
   .form-group select:disabled { color: #9ca3af; cursor: not-allowed; }
   .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Champ Mvola */
+  .mvola-wrap { position: relative; }
+  .mvola-wrap input { letter-spacing: 0.05em; font-family: monospace; font-size: 0.95rem; }
+  .mvola-preview { font-size: 0.78rem; color: #1a56db; margin-top: 4px; font-family: monospace; font-weight: 600; min-height: 16px; }
+  .mvola-hint { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+  .mvola-valid { border-color: #059669 !important; }
+  .mvola-invalid { border-color: #dc2626 !important; }
+
   .btn { width: 100%; padding: 12px; background: #1a56db; color: #fff; border: none; border-radius: 9px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn:hover { background: #1648c0; }
   .btn:active { transform: scale(0.98); }
   .btn:disabled { background: #93c5fd; cursor: not-allowed; }
   .error-box { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #dc2626; margin-bottom: 12px; }
   .warn-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #92400e; margin-bottom: 14px; display: none; }
+  .doublon-box { display: none; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 16px; font-size: 0.875rem; color: #9a3412; margin-bottom: 12px; }
+  .doublon-box strong { display: block; margin-bottom: 4px; }
   .hint { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
   .note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
   .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Tableau */
   .participants-section { margin-top: 1.5rem; }
   .participants-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
   .participants-header .ptitle { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
@@ -53,6 +66,8 @@
   tbody td { padding: 9px 12px; color: #374151; }
   tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 44px; }
   .table-msg { text-align: center; padding: 1.5rem; color: #9ca3af; font-size: 0.85rem; }
+
+  /* Succès */
   .success-box { display: none; text-align: center; padding: 2rem 1rem; }
   .success-box .icon { width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
   .success-box h2 { font-size: 1.2rem; color: #065f46; margin-bottom: 0.5rem; }
@@ -91,6 +106,7 @@
 
     <hr class="separator">
     <p class="section-title">Informations personnelles</p>
+
     <div class="form-group">
       <label>Nom et prénoms <span class="req">*</span></label>
       <input type="text" id="f-nom" placeholder="Ex : RAKOTO Jean" autocomplete="name" />
@@ -122,12 +138,23 @@
       <label>Fonction <span class="req">*</span></label>
       <input type="text" id="f-fonction" placeholder="Ex : Directeur Régional" />
     </div>
+
+    <!-- Champ Mvola + CIN avec formatage automatique -->
     <div class="form-group">
       <label>N° Mvola et CIN <span class="req">*</span></label>
-      <input type="text" id="f-mvola" placeholder="Ex : 034 XX XXX XX / CIN 123456789" />
+      <div class="mvola-wrap">
+        <input type="tel" id="f-mvola" placeholder="Tapez uniquement les chiffres" maxlength="30" oninput="formatMvola(this)" />
+        <div class="mvola-preview" id="mvola-preview"></div>
+        <div class="mvola-hint">Format : <strong>XXX XX XXX XX</strong> / <strong>XXX XXX XXX XXX</strong> — chiffres uniquement</div>
+      </div>
     </div>
 
+    <div class="doublon-box" id="doublon-box">
+      <strong>⚠ Inscription déjà enregistrée</strong>
+      Vous êtes déjà inscrit(e) à cette formation aujourd'hui. Vous ne pouvez pas vous inscrire deux fois.
+    </div>
     <div class="error-box" id="error-box"></div>
+
     <button class="btn" id="btn-submit" onclick="soumettre()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span id="btn-label">Enregistrer ma présence</span>
@@ -185,7 +212,7 @@
   // =====================================================
   // REMPLACEZ CETTE URL PAR VOTRE URL GOOGLE APPS SCRIPT
   // =====================================================
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby1ZEbeiqp5alJzMspp_paklHrqu-XZv-grRc5rsXNfM4lxFurqeU0xDFpZ1sGm1yVj/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxv54Gr4ql6KpUafsEqY31j8gseyB_npcMbgFJKF7O-5PcTCJNaW2Jw7PFTReeaahWx/exec";
   // =====================================================
 
   const DISTRICTS = {
@@ -217,24 +244,72 @@
   let formationSelectionnee = "";
   let cbCounter = 0;
 
-  // Appel JSONP — contourne le CORS de Google Apps Script
+  // ---- JSONP ----
   function jsonp(url, callback) {
     const cbName = 'cb_' + (++cbCounter);
-    window[cbName] = function(data) {
-      delete window[cbName];
-      document.head.removeChild(script);
-      callback(data);
-    };
+    window[cbName] = function(data) { delete window[cbName]; document.head.removeChild(script); callback(data); };
     const script = document.createElement('script');
-    script.src = url + '&callback=' + cbName;
-    script.onerror = function() {
-      delete window[cbName];
-      document.head.removeChild(script);
-      callback(null);
-    };
+    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
+    script.onerror = function() { delete window[cbName]; document.head.removeChild(script); callback(null); };
     document.head.appendChild(script);
   }
 
+  // ---- Formatage Mvola ----
+  function formatMvola(input) {
+    // Garder uniquement les chiffres
+    const digits = input.value.replace(/\D/g, '').substring(0, 23);
+    input.value = digits;
+    const preview = document.getElementById('mvola-preview');
+
+    // Format Mvola : XXX XX XXX XX (10 chiffres)
+    // Format CIN   : XXX XXX XXX XXX (12 chiffres)
+    let mvola = '', cin = '', display = '';
+
+    if (digits.length <= 10) {
+      // Formatage Mvola uniquement
+      const d = digits;
+      if (d.length > 0) mvola += d.substring(0,3);
+      if (d.length > 3) mvola += ' ' + d.substring(3,5);
+      if (d.length > 5) mvola += ' ' + d.substring(5,8);
+      if (d.length > 8) mvola += ' ' + d.substring(8,10);
+      display = mvola;
+    } else {
+      // Mvola complet + CIN
+      const m = digits.substring(0,10);
+      mvola = m.substring(0,3) + ' ' + m.substring(3,5) + ' ' + m.substring(5,8) + ' ' + m.substring(8,10);
+      const c = digits.substring(10);
+      if (c.length > 0) cin += c.substring(0,3);
+      if (c.length > 3) cin += ' ' + c.substring(3,6);
+      if (c.length > 6) cin += ' ' + c.substring(6,9);
+      if (c.length > 9) cin += ' ' + c.substring(9,12);
+      display = mvola + ' / ' + cin;
+    }
+
+    preview.textContent = display ? '→ ' + display : '';
+
+    // Validation visuelle
+    if (digits.length === 23) {
+      input.classList.add('mvola-valid'); input.classList.remove('mvola-invalid');
+      preview.style.color = '#059669';
+    } else if (digits.length > 0) {
+      input.classList.remove('mvola-valid'); input.classList.remove('mvola-invalid');
+      preview.style.color = '#1a56db';
+    } else {
+      input.classList.remove('mvola-valid','mvola-invalid');
+    }
+  }
+
+  function getMvolaFormatted() {
+    const digits = document.getElementById('f-mvola').value.replace(/\D/g,'');
+    if (digits.length < 23) return null;
+    const m = digits.substring(0,10);
+    const c = digits.substring(10,22);
+    const mvola = m.substring(0,3)+' '+m.substring(3,5)+' '+m.substring(5,8)+' '+m.substring(8,10);
+    const cin   = c.substring(0,3)+' '+c.substring(3,6)+' '+c.substring(6,9)+' '+c.substring(9,12);
+    return mvola + ' / ' + cin;
+  }
+
+  // ---- Chargement formations ----
   window.addEventListener('load', function() { chargerFormations(); });
 
   function chargerFormations() {
@@ -249,7 +324,7 @@
       const hint = document.getElementById('formation-hint');
       if (data && data.status === 'success' && data.formations.length > 0) {
         sel.innerHTML = '<option value="">— Choisir la formation —</option>';
-        data.formations.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
+        data.formations.forEach(f => { const o = document.createElement('option'); o.value=f; o.textContent=f; sel.appendChild(o); });
         sel.disabled = false;
         hint.textContent = data.formations.length + ' formation(s) disponible(s)';
       } else {
@@ -261,7 +336,7 @@
   }
 
   function onFormationChange() {
-    const val     = document.getElementById('f-formation').value;
+    const val = document.getElementById('f-formation').value;
     const banner  = document.getElementById('formation-banner');
     const section = document.getElementById('participants-section');
     if (val) {
@@ -281,12 +356,11 @@
     if (!formationSelectionnee || GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") return;
     const tbody = document.getElementById('participants-tbody');
     tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Chargement...</td></tr>';
-    const url = GOOGLE_SCRIPT_URL + '?action=getParticipants&formation=' + encodeURIComponent(formationSelectionnee);
-    jsonp(url, function(data) {
+    jsonp(GOOGLE_SCRIPT_URL + '?action=getParticipants&formation=' + encodeURIComponent(formationSelectionnee), function(data) {
       if (data && data.status === 'success' && data.participants && data.participants.length > 0) {
         document.getElementById('participants-count').textContent = data.participants.length;
         tbody.innerHTML = data.participants.map(p =>
-          '<tr><td>' + esc(p.numero) + '</td><td>' + esc(p.nom) + '</td><td>' + esc(p.formation) + '</td><td>' + esc(p.region) + '</td><td>' + esc(p.fonction) + '</td></tr>'
+          '<tr><td>'+esc(p.numero)+'</td><td>'+esc(p.nom)+'</td><td>'+esc(p.formation)+'</td><td>'+esc(p.region)+'</td><td>'+esc(p.fonction)+'</td></tr>'
         ).join('');
       } else {
         document.getElementById('participants-count').textContent = '0';
@@ -295,18 +369,16 @@
     });
   }
 
-  function esc(t) { return t ? String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
-
   function chargerDistricts() {
     const region = document.getElementById('f-region').value;
     const sel    = document.getElementById('f-district');
     const hint   = document.getElementById('district-hint');
     sel.innerHTML = '';
-    if (!region) { sel.disabled = true; sel.innerHTML = '<option value="">— Choisir la région d\'abord —</option>'; hint.textContent = 'Sélectionnez d\'abord une région'; return; }
+    if (!region) { sel.disabled=true; sel.innerHTML='<option value="">— Choisir la région d\'abord —</option>'; hint.textContent='Sélectionnez d\'abord une région'; return; }
     const districts = DISTRICTS[region] || [];
     sel.disabled = false;
     sel.innerHTML = '<option value="">— Choisir le district —</option>';
-    districts.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o); });
+    districts.forEach(d => { const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
     hint.textContent = districts.length + ' district(s) disponible(s)';
   }
 
@@ -316,24 +388,39 @@
     const region    = document.getElementById('f-region').value;
     const district  = document.getElementById('f-district').value;
     const fonction  = document.getElementById('f-fonction').value.trim();
-    const mvola     = document.getElementById('f-mvola').value.trim();
+    const mvola     = getMvolaFormatted();
     const errBox    = document.getElementById('error-box');
-    if (!formation || !nom || !region || !district || !fonction || !mvola) {
+    const doublonBox = document.getElementById('doublon-box');
+
+    doublonBox.style.display = 'none';
+    errBox.style.display = 'none';
+
+    if (!formation || !nom || !region || !district || !fonction) {
       errBox.style.display = 'block'; errBox.textContent = 'Veuillez remplir tous les champs obligatoires.'; return;
     }
-    errBox.style.display = 'none';
+    if (!mvola) {
+      errBox.style.display = 'block'; errBox.textContent = 'Le N° Mvola et CIN doit contenir 23 chiffres au total (10 pour Mvola + 12 pour CIN + 1 séparateur).'; return;
+    }
+
     const btn = document.getElementById('btn-submit');
     const label = document.getElementById('btn-label');
     const spinner = document.getElementById('spinner');
-    btn.disabled = true; label.textContent = 'Enregistrement...'; spinner.style.display = 'block';
+    btn.disabled=true; label.textContent='Enregistrement...'; spinner.style.display='block';
+
     const now = new Date();
     const dateHeure = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-    const url = GOOGLE_SCRIPT_URL + '?action=enregistrer&formation=' + encodeURIComponent(formation) +
-      '&nom=' + encodeURIComponent(nom) + '&region=' + encodeURIComponent(region) +
-      '&district=' + encodeURIComponent(district) + '&fonction=' + encodeURIComponent(fonction) +
-      '&mvola=' + encodeURIComponent(mvola) + '&date_heure=' + encodeURIComponent(dateHeure);
+    const url = GOOGLE_SCRIPT_URL +
+      '?action=enregistrer' +
+      '&formation=' + encodeURIComponent(formation) +
+      '&nom='       + encodeURIComponent(nom) +
+      '&region='    + encodeURIComponent(region) +
+      '&district='  + encodeURIComponent(district) +
+      '&fonction='  + encodeURIComponent(fonction) +
+      '&mvola='     + encodeURIComponent(mvola) +
+      '&date_heure='+ encodeURIComponent(dateHeure);
+
     jsonp(url, function(data) {
-      btn.disabled = false; label.textContent = 'Enregistrer ma présence'; spinner.style.display = 'none';
+      btn.disabled=false; label.textContent='Enregistrer ma présence'; spinner.style.display='none';
       if (data && data.status === 'success') {
         document.getElementById('form-section').style.display = 'none';
         document.getElementById('success-box').style.display  = 'block';
@@ -343,6 +430,8 @@
         document.getElementById('s-region').textContent       = region;
         document.getElementById('s-district').textContent     = district;
         document.getElementById('s-fonction').textContent     = fonction;
+      } else if (data && data.status === 'doublon') {
+        doublonBox.style.display = 'block';
       } else {
         errBox.style.display = 'block';
         errBox.textContent = 'Erreur d\'enregistrement. Vérifiez votre URL Google Script.';
@@ -350,12 +439,18 @@
     });
   }
 
+  function esc(t) { return t ? String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+
   function nouveau() {
     document.getElementById('success-box').style.display  = 'none';
     document.getElementById('form-section').style.display = 'block';
     document.getElementById('participants-section').style.display = 'none';
     document.getElementById('formation-banner').style.display = 'none';
-    ['f-nom','f-fonction','f-mvola'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('doublon-box').style.display = 'none';
+    ['f-nom','f-fonction'].forEach(id => document.getElementById(id).value = '');
+    const mvola = document.getElementById('f-mvola');
+    mvola.value = ''; mvola.classList.remove('mvola-valid','mvola-invalid');
+    document.getElementById('mvola-preview').textContent = '';
     document.getElementById('f-formation').value = '';
     document.getElementById('f-region').value = '';
     document.getElementById('f-district').innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
