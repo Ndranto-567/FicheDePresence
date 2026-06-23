@@ -3,86 +3,209 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fiche de présence</title>
+<title>Fiche de présence & Base Utilisateurs</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 1.5rem 1rem; }
-  .card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); max-width: 640px; width: 100%; padding: 2rem 2.5rem; }
-  .header { text-align: center; margin-bottom: 1.75rem; }
-  .header .logo { width: 56px; height: 56px; background: #1a56db; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
-  .header .logo svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2; }
-  .header h1 { font-size: 1.35rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.25rem; }
-  .header p { font-size: 0.875rem; color: #6b7280; }
-  .formation-banner { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 10px; }
-  .formation-banner svg { flex-shrink: 0; margin-top: 1px; }
-  .formation-banner .label { font-size: 0.75rem; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-  .formation-banner .value { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
-  .separator { border: none; border-top: 1.5px dashed #e5e7eb; margin: 18px 0; }
-  .section-title { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
-  .form-group { margin-bottom: 14px; }
-  .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
-  .form-group label .req { color: #e53e3e; margin-left: 2px; }
-  .form-group input, .form-group select { width: 100%; padding: 10px 13px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; color: #1a1a2e; background: #f9fafb; transition: border-color 0.2s; outline: none; appearance: auto; }
-  .form-group input:focus, .form-group select:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.12); background: #fff; }
-  .form-group select:disabled { color: #9ca3af; cursor: not-allowed; }
-  .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-height: 100vh; }
 
-  /* Champ Mvola */
-  .mvola-wrap input { font-family: monospace; font-size: 1rem; letter-spacing: 0.08em; }
-  .mvola-valid  { border-color: #059669 !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.12) !important; }
-  .mvola-prog { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
-  .mvola-hint { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+/* ---- NAV TABS ---- */
+.nav-tabs {
+  background: #1a56db;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 4px;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.nav-logo { color: #fff; font-size: 1rem; font-weight: 700; padding: 14px 16px 14px 0; margin-right: 8px; border-right: 1px solid rgba(255,255,255,0.2); white-space: nowrap; }
+.tab-btn {
+  padding: 14px 20px;
+  border: none;
+  background: none;
+  color: rgba(255,255,255,0.75);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.tab-btn.active { color: #fff; border-bottom-color: #fff; }
 
-  .btn { width: 100%; padding: 12px; background: #1a56db; color: #fff; border: none; border-radius: 9px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn:hover { background: #1648c0; }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { background: #93c5fd; cursor: not-allowed; }
-  .error-box { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #dc2626; margin-bottom: 12px; }
-  .warn-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #92400e; margin-bottom: 14px; display: none; }
-  .doublon-box { display: none; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 16px; font-size: 0.875rem; color: #9a3412; margin-bottom: 12px; }
-  .doublon-box strong { display: block; margin-bottom: 4px; }
-  .hint { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
-  .note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
-  .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* ---- PAGES ---- */
+.page { display: none; }
+.page.active { display: block; }
 
-  /* Tableau */
-  .participants-section { margin-top: 1.5rem; }
-  .participants-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-  .participants-header .ptitle { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
-  .count-badge { background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
-  .btn-refresh { background: none; border: 0.5px solid #d1d5db; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 5px; }
-  .btn-refresh:hover { background: #f3f4f6; }
-  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #e5e7eb; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-  thead tr { background: #1a56db; }
-  thead th { color: #fff; font-weight: 600; padding: 9px 12px; text-align: left; white-space: nowrap; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
-  tbody tr { border-bottom: 1px solid #f3f4f6; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:nth-child(even) { background: #f8faff; }
-  tbody tr:hover { background: #eff6ff; }
-  tbody td { padding: 9px 12px; color: #374151; }
-  tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 44px; }
-  .table-msg { text-align: center; padding: 1.5rem; color: #9ca3af; font-size: 0.85rem; }
+/* ======================================================
+   PAGE 1 — FORMULAIRE D'INSCRIPTION
+   ====================================================== */
+.form-page { display: flex; align-items: flex-start; justify-content: center; padding: 1.5rem 1rem; min-height: calc(100vh - 48px); }
+.card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.10); max-width: 640px; width: 100%; padding: 2rem 2.5rem; }
+.header { text-align: center; margin-bottom: 1.75rem; }
+.header .logo { width: 56px; height: 56px; background: #1a56db; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 0.75rem; }
+.header .logo svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 2; }
+.header h1 { font-size: 1.35rem; font-weight: 700; color: #1a1a2e; margin-bottom: 0.25rem; }
+.header p { font-size: 0.875rem; color: #6b7280; }
+.formation-banner { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 12px 16px; margin-bottom: 18px; display: flex; align-items: flex-start; gap: 10px; }
+.formation-banner svg { flex-shrink: 0; margin-top: 1px; }
+.formation-banner .f-label { font-size: 0.75rem; font-weight: 600; color: #1e40af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.formation-banner .f-value { font-size: 0.95rem; font-weight: 700; color: #1a1a2e; }
+.separator { border: none; border-top: 1.5px dashed #e5e7eb; margin: 18px 0; }
+.section-title { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+.form-group { margin-bottom: 14px; }
+.form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #374151; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+.form-group label .req { color: #e53e3e; margin-left: 2px; }
+.form-group input, .form-group select { width: 100%; padding: 10px 13px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; color: #1a1a2e; background: #f9fafb; transition: border-color 0.2s; outline: none; appearance: auto; }
+.form-group input:focus, .form-group select:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.12); background: #fff; }
+.form-group select:disabled { color: #9ca3af; cursor: not-allowed; }
+.form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.btn-submit { width: 100%; padding: 12px; background: #1a56db; color: #fff; border: none; border-radius: 9px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-submit:hover { background: #1648c0; }
+.btn-submit:active { transform: scale(0.98); }
+.btn-submit:disabled { background: #93c5fd; cursor: not-allowed; }
+.error-box { display: none; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #dc2626; margin-bottom: 12px; }
+.warn-box { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #92400e; margin-bottom: 14px; display: none; }
+.doublon-box { display: none; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 16px; font-size: 0.875rem; color: #9a3412; margin-bottom: 12px; }
+.doublon-box strong { display: block; margin-bottom: 4px; }
+.hint { font-size: 0.75rem; color: #9ca3af; margin-top: 3px; }
+.note { font-size: 0.78rem; color: #9ca3af; text-align: center; margin-top: 1rem; }
+.spinner-form { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+/* Mvola */
+.mvola-wrap input { font-family: monospace; font-size: 1rem; letter-spacing: 0.08em; }
+.mvola-valid { border-color: #059669 !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.12) !important; }
+.mvola-prog { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
+.mvola-hint { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
+/* Signature */
+.sig-box { border: 1.5px solid #d1d5db; border-radius: 8px; background: #f9fafb; overflow: hidden; position: relative; cursor: crosshair; }
+.sig-placeholder { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 13px; color: #9ca3af; pointer-events: none; text-align: center; }
+.sig-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.sig-status { font-size: 12px; color: #9ca3af; }
+.sig-clear { font-size: 12px; padding: 4px 10px; color: #dc2626; background: none; border: 1px solid #fca5a5; border-radius: 6px; cursor: pointer; display: none; }
+/* Success */
+.success-box { display: none; text-align: center; padding: 2rem 1rem; }
+.success-box .s-icon { width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+.success-box h2 { font-size: 1.2rem; color: #065f46; margin-bottom: 0.5rem; }
+.success-box .name-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin: 0.5rem 0; font-size: 1rem; }
+.numero-badge { display: inline-block; background: #f0fdf4; color: #166534; font-weight: 700; padding: 3px 12px; border-radius: 20px; font-size: 0.85rem; border: 1px solid #bbf7d0; margin-left: 6px; }
+.success-detail { background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-top: 12px; text-align: left; font-size: 0.82rem; color: #6b7280; line-height: 1.9; }
+.success-detail strong { color: #1a1a2e; }
+.btn-new { margin-top: 1rem; padding: 9px 24px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+/* Participants table */
+.participants-section { margin-top: 1.5rem; }
+.participants-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.participants-header .ptitle { font-size: 0.75rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; }
+.count-badge { background: #dbeafe; color: #1e40af; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+.btn-refresh { background: none; border: 0.5px solid #d1d5db; border-radius: 7px; padding: 5px 10px; font-size: 12px; color: #6b7280; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.btn-refresh:hover { background: #f3f4f6; }
+.table-wrap-inner { overflow-x: auto; border-radius: 10px; border: 1px solid #e5e7eb; }
+.table-wrap-inner table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.table-wrap-inner thead tr { background: #1a56db; }
+.table-wrap-inner thead th { color: #fff; font-weight: 600; padding: 9px 12px; text-align: left; white-space: nowrap; font-size: 0.78rem; text-transform: uppercase; }
+.table-wrap-inner tbody tr { border-bottom: 1px solid #f3f4f6; }
+.table-wrap-inner tbody tr:last-child { border-bottom: none; }
+.table-wrap-inner tbody tr:nth-child(even) { background: #f8faff; }
+.table-wrap-inner tbody tr:hover { background: #eff6ff; }
+.table-wrap-inner tbody td { padding: 9px 12px; color: #374151; }
+.table-wrap-inner tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 44px; }
+.table-msg { text-align: center; padding: 1.5rem; color: #9ca3af; font-size: 0.85rem; }
 
-  /* Succès */
-  .success-box { display: none; text-align: center; padding: 2rem 1rem; }
-  .success-box .icon { width: 64px; height: 64px; background: #ecfdf5; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
-  .success-box h2 { font-size: 1.2rem; color: #065f46; margin-bottom: 0.5rem; }
-  .success-box .name-badge { display: inline-block; background: #dbeafe; color: #1e40af; font-weight: 700; padding: 4px 14px; border-radius: 20px; margin: 0.5rem 0; font-size: 1rem; }
-  .numero-badge { display: inline-block; background: #f0fdf4; color: #166534; font-weight: 700; padding: 3px 12px; border-radius: 20px; font-size: 0.85rem; border: 1px solid #bbf7d0; margin-left: 6px; }
-  .success-detail { background: #f9fafb; border-radius: 8px; padding: 10px 14px; margin-top: 12px; text-align: left; font-size: 0.82rem; color: #6b7280; line-height: 1.9; }
-  .success-detail strong { color: #1a1a2e; }
-  .btn-new { margin-top: 1rem; padding: 9px 24px; background: #f3f4f6; color: #374151; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-  @media (max-width: 480px) { .card { padding: 1.5rem 1.25rem; } .form-grid-2 { grid-template-columns: 1fr; } }
+/* ======================================================
+   PAGE 2 — ÉDITEUR BASE-UTILISATEURS
+   ====================================================== */
+.topbar2 {
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.topbar2 h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; }
+.topbar2 p  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.topbar2-right { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn-ed { padding: 7px 14px; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+.btn-orange { background: #f97316; color: #fff; } .btn-orange:hover { background: #ea580c; }
+.btn-blue   { background: #1a56db; color: #fff; } .btn-blue:hover   { background: #1648c0; }
+.btn-gray2  { background: #6b7280; color: #fff; } .btn-gray2:hover  { background: #4b5563; }
+.btn-green2 { background: #059669; color: #fff; } .btn-green2:hover { background: #047857; }
+.stats-bar2 { display: flex; gap: 12px; padding: 10px 24px; background: #fff; border-bottom: 1px solid #e5e7eb; flex-wrap: wrap; }
+.stat-card { display: flex; align-items: center; gap: 8px; padding: 5px 14px; border-radius: 8px; font-size: 13px; }
+.stat-card.total   { background: #dbeafe; color: #1e40af; }
+.stat-card.missing2{ background: #fef3c7; color: #92400e; }
+.stat-card.ok2     { background: #d1fae5; color: #065f46; }
+.stat-card strong  { font-size: 18px; font-weight: 700; }
+.search-bar2 { padding: 10px 24px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.search-input2 { padding: 8px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 13px; outline: none; min-width: 220px; flex: 1; }
+.search-input2:focus { border-color: #1a56db; }
+.table-wrap2 { overflow-x: auto; padding: 16px 24px; }
+.ed-table { width: 100%; border-collapse: collapse; font-size: 13px; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+.ed-table thead tr { background: #1a56db; }
+.ed-table thead th { color: #fff; font-weight: 600; padding: 10px 12px; text-align: left; white-space: nowrap; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+.ed-table tbody tr { border-bottom: 1px solid #f3f4f6; cursor: pointer; transition: background 0.12s; }
+.ed-table tbody tr:last-child { border-bottom: none; }
+.ed-table tbody tr:hover { background: #eff6ff; }
+.ed-table tbody tr.row-missing { background: #fffbeb; }
+.ed-table tbody tr.row-missing:hover { background: #fef3c7; }
+.ed-table tbody td { padding: 9px 12px; color: #374151; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ed-table tbody td:first-child { font-weight: 700; color: #1a56db; text-align: center; width: 40px; }
+.cell-miss { color: #d97706; font-style: italic; font-size: 12px; }
+.badge-miss { display: inline-block; background: #fef3c7; color: #92400e; font-size: 11px; padding: 1px 7px; border-radius: 10px; font-weight: 600; }
+.badge-ok2  { display: inline-block; background: #d1fae5; color: #065f46;  font-size: 11px; padding: 1px 7px; border-radius: 10px; font-weight: 600; }
+/* Modal éditeur */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.active { display: flex; }
+.modal { background: #fff; border-radius: 14px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.2); margin: 1rem; }
+.modal-header { padding: 18px 24px 14px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; position: sticky; top: 0; background: #fff; z-index: 10; }
+.modal-header h2 { font-size: 1rem; font-weight: 700; color: #1a1a2e; }
+.modal-header p  { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.modal-close { background: none; border: none; font-size: 22px; color: #9ca3af; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
+.modal-close:hover { background: #f3f4f6; color: #374151; }
+.modal-body   { padding: 20px 24px; }
+.modal-footer { padding: 14px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 8px; position: sticky; bottom: 0; background: #fff; }
+.m-form-group { margin-bottom: 14px; }
+.m-form-group label { display: block; font-size: 11px; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.m-form-group input, .m-form-group select { width: 100%; padding: 9px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 13px; color: #1a1a2e; background: #f9fafb; outline: none; transition: border-color 0.15s; }
+.m-form-group input:focus, .m-form-group select:focus { border-color: #1a56db; box-shadow: 0 0 0 3px rgba(26,86,219,0.1); background: #fff; }
+.m-form-group input.field-miss, .m-form-group select.field-miss { border-color: #f59e0b; background: #fffbeb; }
+.m-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.m-section { font-size: 11px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.08em; margin: 18px 0 10px; padding-bottom: 6px; border-bottom: 1px dashed #e5e7eb; }
+.m-readonly { font-size: 11px; color: #9ca3af; margin-left: 6px; font-style: italic; text-transform: none; letter-spacing: 0; }
+.miss-warn { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #92400e; margin-bottom: 14px; }
+/* Toast */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #065f46; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,0.18); z-index: 999; display: none; align-items: center; gap: 8px; }
+.toast.error { background: #dc2626; }
+.toast.show  { display: flex; }
+.spinner-ed { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+.no-results2 { text-align: center; padding: 3rem; color: #9ca3af; font-size: 14px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) {
+  .card { padding: 1.5rem 1.25rem; }
+  .form-grid-2, .m-row-2 { grid-template-columns: 1fr; }
+  .table-wrap2 { padding: 8px; }
+  .nav-logo { display: none; }
+}
 </style>
 </head>
 <body>
+
+<!-- NAVIGATION -->
+<nav class="nav-tabs">
+  <span class="nav-logo">📋 Espace Réunion</span>
+  <button class="tab-btn active" onclick="showTab('inscription')">✏️ Fiche de présence</button>
+  <button class="tab-btn" onclick="showTab('editeur')">🗂 Base Utilisateurs</button>
+</nav>
+
+<!-- ===================== PAGE 1 : INSCRIPTION ===================== -->
+<div id="page-inscription" class="page active">
+<div class="form-page">
 <div class="card">
   <div class="header">
-    <div class="logo">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-    </div>
+    <div class="logo"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
     <h1>Fiche de présence</h1>
     <p>Veuillez renseigner vos informations avant d'entrer</p>
   </div>
@@ -95,16 +218,15 @@
       <select id="f-formation" disabled onchange="onFormationChange()">
         <option value="">— Chargement en cours... —</option>
       </select>
-      <p class="hint" id="formation-hint">Chargement de la liste depuis Google Sheet...</p>
+      <p class="hint" id="formation-hint">Chargement depuis Google Sheet...</p>
     </div>
     <div class="formation-banner" id="formation-banner" style="display:none;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1a56db" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-      <div><div class="label">Formation sélectionnée</div><div class="value" id="formation-banner-text"></div></div>
+      <div><div class="f-label">Formation sélectionnée</div><div class="f-value" id="formation-banner-text"></div></div>
     </div>
 
     <hr class="separator">
     <p class="section-title">Informations personnelles</p>
-
     <div class="form-group">
       <label>Nom et prénoms <span class="req">*</span></label>
       <input type="text" id="f-nom" placeholder="Ex : RAKOTO Jean" autocomplete="name" />
@@ -137,8 +259,6 @@
       <label>Fonction <span class="req">*</span></label>
       <input type="text" id="f-fonction" placeholder="Ex : Directeur Régional" />
     </div>
-
-    <!-- Champ Mvola + CIN avec formatage automatique -->
     <div class="form-group">
       <label>N° Mvola et CIN <span class="req">*</span></label>
       <div class="mvola-wrap">
@@ -147,56 +267,50 @@
         <div class="mvola-hint">Tapez uniquement les chiffres — le format <strong>XXX XX XXX XX / XXX XXX XXX XXX</strong> s'applique automatiquement</div>
       </div>
     </div>
-
-    <div class="doublon-box" id="doublon-box">
-      <strong>⚠ Inscription déjà enregistrée</strong>
-      Vous êtes déjà inscrit(e) à cette formation aujourd'hui. Vous ne pouvez pas vous inscrire deux fois.
+    <div class="form-group">
+      <label>Signature <span style="font-size:0.7rem;color:#9ca3af;font-weight:400;text-transform:none;">(optionnelle)</span></label>
+      <div class="sig-box" style="height:120px;">
+        <canvas id="sig-canvas" style="display:block;width:100%;height:120px;touch-action:none;"></canvas>
+        <div class="sig-placeholder" id="sig-placeholder">✍ Signez ici avec la souris ou le doigt</div>
+      </div>
+      <div class="sig-footer">
+        <span class="sig-status" id="sig-status">En attente de signature</span>
+        <button class="sig-clear" id="sig-clear" onclick="clearSig()">✕ Effacer</button>
+      </div>
     </div>
-    <div class="error-box" id="error-box"></div>
 
-    <button class="btn" id="btn-submit" onclick="soumettre()">
+    <div class="doublon-box" id="doublon-box"><strong>⚠ Inscription déjà enregistrée</strong>Vous êtes déjà inscrit(e) à cette formation aujourd'hui.</div>
+    <div class="error-box" id="error-box"></div>
+    <button class="btn-submit" id="btn-submit" onclick="soumettre()">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
       <span id="btn-label">Enregistrer ma présence</span>
-      <div class="spinner" id="spinner"></div>
+      <div class="spinner-form" id="spinner"></div>
     </button>
     <p class="note">* Champs obligatoires — le numéro est attribué automatiquement</p>
 
-    <!-- Tableau participants -->
     <div class="participants-section" id="participants-section" style="display:none;">
       <hr class="separator">
       <div class="participants-header">
         <span class="ptitle">Participants inscrits</span>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="count-badge" id="participants-count">0</span>
-          <button class="btn-refresh" onclick="chargerParticipants()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-            Actualiser
-          </button>
+          <button class="btn-refresh" onclick="chargerParticipants()">↺ Actualiser</button>
         </div>
       </div>
-      <div class="table-wrap">
+      <div class="table-wrap-inner">
         <table>
-          <thead>
-            <tr><th>N°</th><th>Nom et prénoms</th><th>Formation</th><th>Région</th><th>Fonction</th></tr>
-          </thead>
-          <tbody id="participants-tbody">
-            <tr><td colspan="5" class="table-msg">Sélectionnez une formation pour voir les participants</td></tr>
-          </tbody>
+          <thead><tr><th>N°</th><th>Nom et prénoms</th><th>Formation</th><th>Région</th><th>Fonction</th></tr></thead>
+          <tbody id="participants-tbody"><tr><td colspan="5" class="table-msg">Sélectionnez une formation</td></tr></tbody>
         </table>
       </div>
     </div>
   </div>
 
   <div class="success-box" id="success-box">
-    <div class="icon">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-    </div>
+    <div class="s-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
     <h2>Présence enregistrée !</h2>
-    <div>
-      <span class="name-badge" id="success-name"></span>
-      <span class="numero-badge" id="success-numero"></span>
-    </div>
-    <p style="margin-top:8px;">Vos informations ont été sauvegardées dans Google Sheet.</p>
+    <div><span class="name-badge" id="success-name"></span><span class="numero-badge" id="success-numero"></span></div>
+    <p style="margin-top:8px;">Sauvegardé dans Google Sheet.</p>
     <div class="success-detail">
       <div>Formation : <strong id="s-formation"></strong></div>
       <div>Région : <strong id="s-region"></strong></div>
@@ -206,306 +320,433 @@
     <button class="btn-new" onclick="nouveau()">+ Nouvelle inscription</button>
   </div>
 </div>
+</div>
+</div>
+
+<!-- ===================== PAGE 2 : ÉDITEUR ===================== -->
+<div id="page-editeur" class="page">
+  <div class="topbar2">
+    <div>
+      <h2>🗂 Base-Utilisateurs — Éditeur</h2>
+      <p id="ed-sheet-info">Chargement...</p>
+    </div>
+    <div class="topbar2-right">
+      <button class="btn-ed btn-orange" id="btn-missing" onclick="toggleMissing()">⚠ Afficher manquants</button>
+      <button class="btn-ed btn-blue" onclick="rechargerBase()">↺ Actualiser</button>
+    </div>
+  </div>
+  <div class="stats-bar2">
+    <div class="stat-card total"><strong id="stat-total">—</strong>&nbsp;Total</div>
+    <div class="stat-card missing2"><strong id="stat-missing">—</strong>&nbsp;Manquants</div>
+    <div class="stat-card ok2"><strong id="stat-ok">—</strong>&nbsp;Complets</div>
+  </div>
+  <div class="search-bar2">
+    <input type="text" class="search-input2" id="ed-search" placeholder="🔍 Rechercher par nom, région, district..." oninput="filtrerBase()" />
+    <span id="ed-result-count" style="font-size:12px;color:#6b7280;white-space:nowrap;"></span>
+  </div>
+  <div class="table-wrap2">
+    <table class="ed-table">
+      <thead>
+        <tr><th>#</th><th>Région</th><th>District</th><th>Nom et Prénom</th><th>Email</th><th>Entité</th><th>Niveau</th><th>Poste</th><th>Genre</th><th>Âge</th><th>Statut</th></tr>
+      </thead>
+      <tbody id="ed-tbody"><tr><td colspan="11" class="no-results2">Cliquez sur l'onglet pour charger...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL ÉDITEUR -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div><h2 id="modal-title">Modifier</h2><p id="modal-subtitle"></p></div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="miss-warn" id="miss-warn" style="display:none;">⚠ Certains champs sont manquants — veuillez les compléter.</div>
+      <div class="m-section">Informations de base <span class="m-readonly">(lecture seule)</span></div>
+      <div class="m-row-2">
+        <div class="m-form-group"><label>Région</label><input type="text" id="m-region" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+        <div class="m-form-group"><label>District</label><input type="text" id="m-district" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+      </div>
+      <div class="m-form-group"><label>Nom et Prénom</label><input type="text" id="m-nom" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+      <div class="m-row-2">
+        <div class="m-form-group"><label>Email</label><input type="email" id="m-email" placeholder="adresse@email.com" /></div>
+        <div class="m-form-group"><label>Téléphone</label><input type="text" id="m-tel" placeholder="034 XX XXX XX" /></div>
+      </div>
+      <div class="m-section">Champs à compléter</div>
+      <div class="m-row-2">
+        <div class="m-form-group"><label>Entité (col. F)</label><select id="m-entite"><option value="">— Choisir —</option></select></div>
+        <div class="m-form-group"><label>Niveau (col. G)</label><select id="m-niveau"><option value="">— Choisir —</option></select></div>
+      </div>
+      <div class="m-form-group"><label>Poste (col. H)</label><select id="m-poste"><option value="">— Choisir —</option></select></div>
+      <div class="m-row-2">
+        <div class="m-form-group"><label>Genre (col. I)</label><select id="m-genre"><option value="">— Choisir —</option></select></div>
+        <div class="m-form-group"><label>Classe d'âge (col. J)</label><select id="m-age"><option value="">— Choisir —</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ed btn-gray2" onclick="closeModal()">Annuler</button>
+      <button class="btn-ed btn-green2" id="btn-save" onclick="sauvegarderBase()">
+        <span class="spinner-ed" id="save-spinner"></span>💾 Enregistrer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <script>
-  // =====================================================
-  // REMPLACEZ CETTE URL PAR VOTRE URL GOOGLE APPS SCRIPT
-  // =====================================================
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJVWDUGH7TzZfiYDy7o1_YC5rtmng8KTc9WcmH0Oc_pyX4jyzWYcXRq2_CA6sgCH0/exec";
-  // =====================================================
+// =====================================================
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5E3eRv71FFt4XK2UqcuSnokHfyCAV0zCbWQloCUcCJ4p7oYelLhw7e2NU-IgdYAmf/exec";
+// =====================================================
 
-  const DISTRICTS = {
-   "Central":["Direction","SAAF","SLOG","SMEV","STV","Div-SE","Div-DATA"],
-    "Analamanga":["Ambohidratrimo","Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
-    "Vakinankaratra":["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
-    "Itasy":["Arivonimamo","Miarinarivo","Soavinandriana"],
-    "Bongolava":["Fenoarivobe","Tsiroanomandidy"],
-    "Haute Matsiatra":["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
-    "Amoron'i Mania":["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
-    "Vatovavy":["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
-    "Fitovinany":["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
-    "Ihorombe":["Ihosy","Iakora","Ivohibe","Ranohira"],
-    "Atsimo-Atsinanana":["Befotaka","Farafangana","Midongy-Atsimo","Vangaindrano","Vondrozo"],
-    "Atsinanana":["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
-    "Analanjirofo":["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
-    "Alaotra Mangoro":["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
-    "Boeny":["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
-    "Sofia":["Analalava","Antsohihy","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
-    "Betsiboka":["Kandreho","Maevatanana","Tsaratanana"],
-    "Melaky":["Ambatomainty","Antsalova","Besalampy","Maintirano","Morafenobe"],
-    "Atsimo-Andrefana":["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
-    "Androy":["Ambovombe-Androy","Bekily","Beloha","Tsihombe","Antanimora"],
-    "Anosy":["Amboasary-Atsimo","Betroka","Taolagnaro"],
-    "Menabe":["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
-    "Diana":["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
-    "Sava":["Andapa","Antalaha","Sambava","Vohimarina"]
-  };
+// ---- NAVIGATION ----
+function showTab(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (tab === 'editeur' && edAllData.length === 0) rechargerBase();
+}
 
-  let formationSelectionnee = "";
-  let cbCounter = 0;
+// ---- JSONP ----
+let cbCounter = 0;
+function jsonp(url, cb) {
+  const name = 'cb_' + (++cbCounter);
+  window[name] = function(data) { delete window[name]; document.head.removeChild(s); cb(data); };
+  const s = document.createElement('script');
+  s.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + name;
+  s.onerror = () => { delete window[name]; document.head.removeChild(s); cb(null); };
+  document.head.appendChild(s);
+}
 
-  // ---- JSONP ----
-  function jsonp(url, callback) {
-    const cbName = 'cb_' + (++cbCounter);
-    window[cbName] = function(data) { delete window[cbName]; document.head.removeChild(script); callback(data); };
-    const script = document.createElement('script');
-    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
-    script.onerror = function() { delete window[cbName]; document.head.removeChild(script); callback(null); };
-    document.head.appendChild(script);
-  }
+function esc(t) { return t ? String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
 
-  // ---- Formatage Mvola en temps réel dans le champ ----
-  // Mvola : 10 chiffres → XXX XX XXX XX
-  // CIN   : 12 chiffres → XXX XXX XXX XXX
-  // Total : 22 chiffres + séparateur " / " automatique
-  // L'utilisateur peut taper "/" manuellement — il sera accepté et positionné correctement
-  (function() {
-    const MVOLA_LEN = 10;
-    const CIN_LEN   = 12;
-    const TOTAL     = MVOLA_LEN + CIN_LEN; // 22
+// ========================================================
+// PAGE 1 — INSCRIPTION
+// ========================================================
+const DISTRICTS = {
+  "Central":["Direction","SAAF","SLOG","SMEV","STV","Div-SE","Div-DATA"],
+  "Analamanga":["Ambohidratrimo","Antananarivo-Avaradrano","Antananarivo-Atsimondrano","Antananarivo-Renivohitra","Andramasina","Anjozorobe","Ankazobe","Manjakandriana"],
+  "Vakinankaratra":["Antanifotsy","Antsirabe I","Antsirabe II","Betafo","Faratsiho","Mandoto","Ambatolampy"],
+  "Itasy":["Arivonimamo","Miarinarivo","Soavinandriana"],
+  "Bongolava":["Fenoarivobe","Tsiroanomandidy"],
+  "Haute Matsiatra":["Ambalavao","Ambohimahasoa","Fianarantsoa I","Fianarantsoa II","Ikalamavony","Isandra","Lalangina","Vohibato"],
+  "Amoron'i Mania":["Ambatofinandrahana","Ambositra","Fandriana","Manandriana"],
+  "Vatovavy":["Ifanadiana","Ikongo","Mananjary","Nosy Varika"],
+  "Fitovinany":["Manakara","Midongy-Atsimo","Vohipeno","Farafangana"],
+  "Ihorombe":["Ihosy","Iakora","Ivohibe","Ranohira"],
+  "Atsimo-Atsinanana":["Befotaka","Farafangana","Midongy-Atsimo","Vangaindrano","Vondrozo"],
+  "Atsinanana":["Brickaville","Mahanoro","Marolambo","Toamasina I","Toamasina II","Vatomandry","Antanambao Manampotsy"],
+  "Analanjirofo":["Fenoarivo Atsinanana","Mananara-Avaratra","Maroantsetra","Nosy Boraha","Soanierana-Ivongo","Vavatenina"],
+  "Alaotra Mangoro":["Amparafaravola","Andilamena","Anosibe An'ala","Moramanga","Ambatondrazaka"],
+  "Boeny":["Ambato-Boeny","Mahajanga I","Mahajanga II","Marovoay","Mitsinjo","Soalala"],
+  "Sofia":["Analalava","Antsohihy","Befandriana-Avaratra","Bealanana","Mampikony","Mandritsara","Port-Bergé"],
+  "Betsiboka":["Kandreho","Maevatanana","Tsaratanana"],
+  "Melaky":["Ambatomainty","Antsalova","Besalampy","Maintirano","Morafenobe"],
+  "Atsimo-Andrefana":["Ampanihy","Ankazoabo","Benenitra","Beroroha","Betioky-Atsimo","Morombe","Sakaraha","Toliara I","Toliara II"],
+  "Androy":["Ambovombe-Androy","Bekily","Beloha","Tsihombe","Antanimora"],
+  "Anosy":["Amboasary-Atsimo","Betroka","Taolagnaro"],
+  "Menabe":["Belo-Tsiribihina","Mahabo","Manja","Miandrivazo","Morondava"],
+  "Diana":["Ambanja","Ambilobe","Antsiranana I","Antsiranana II","Nosy Be"],
+  "Sava":["Andapa","Antalaha","Sambava","Vohimarina"]
+};
 
-    function formatMvola(digits) {
-      const d = digits.substring(0, MVOLA_LEN);
-      let r = '';
-      if (d.length > 0) r += d.substring(0,3);
-      if (d.length > 3) r += ' ' + d.substring(3,5);
-      if (d.length > 5) r += ' ' + d.substring(5,8);
-      if (d.length > 8) r += ' ' + d.substring(8,10);
-      return r;
-    }
+let formationSelectionnee = "";
 
-    function formatCIN(digits) {
-      const d = digits.substring(0, CIN_LEN);
-      let r = '';
-      if (d.length > 0) r += d.substring(0,3);
-      if (d.length > 3) r += ' ' + d.substring(3,6);
-      if (d.length > 6) r += ' ' + d.substring(6,9);
-      if (d.length > 9) r += ' ' + d.substring(9,12);
-      return r;
-    }
+window.addEventListener('load', chargerFormations);
 
-    function buildFormatted(digits) {
-      const mPart = digits.substring(0, MVOLA_LEN);
-      const cPart = digits.substring(MVOLA_LEN);
-      let result  = formatMvola(mPart);
-      if (digits.length >= MVOLA_LEN) result += ' / ' + formatCIN(cPart);
-      return result;
-    }
-
-    function getDigits(val) { return val.replace(/[^0-9]/g, ''); }
-
-    window.addEventListener('DOMContentLoaded', function() {
-      const input = document.getElementById('f-mvola');
-      const prog  = document.getElementById('mvola-prog');
-      if (!input) return;
-
-      // Autoriser chiffres ET "/"
-      input.addEventListener('keydown', function(e) {
-        const ctrl = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
-        if (ctrl.includes(e.key) || e.ctrlKey || e.metaKey) return;
-        // Accepter chiffres et "/"
-        if (/[0-9\/]/.test(e.key)) return;
-        e.preventDefault();
-      });
-
-      input.addEventListener('input', function() {
-        const cursor = this.selectionStart;
-        const oldVal = this.value;
-        // Extraire les chiffres uniquement (ignorer espaces, slash saisis)
-        const digits = getDigits(oldVal).substring(0, TOTAL);
-        const formatted = buildFormatted(digits);
-        const digitsBeforeCursor = getDigits(oldVal.substring(0, cursor)).length;
-
-        this.value = formatted;
-
-        // Repositionner le curseur après reformatage
-        let newCursor = 0, dc = 0;
-        for (let i = 0; i < formatted.length; i++) {
-          if (dc >= digitsBeforeCursor) break;
-          if (/[0-9]/.test(formatted[i])) dc++;
-          newCursor = i + 1;
-        }
-        this.setSelectionRange(newCursor, newCursor);
-
-        // Indicateur de progression
-        const n = digits.length;
-        if (n === TOTAL) {
-          this.classList.add('mvola-valid');
-          prog.textContent = '✓ Format complet — ' + MVOLA_LEN + ' chiffres Mvola + ' + CIN_LEN + ' chiffres CIN';
-          prog.style.color = '#059669';
-        } else {
-          this.classList.remove('mvola-valid');
-          if (n < MVOLA_LEN) {
-            prog.textContent = 'Mvola : ' + n + '/' + MVOLA_LEN + ' chiffres';
-          } else {
-            prog.textContent = 'Mvola ✓ — CIN : ' + (n - MVOLA_LEN) + '/' + CIN_LEN + ' chiffres';
-          }
-          prog.style.color = '#6b7280';
-        }
-      });
-    });
-  })();
-
-  function getMvolaFormatted() {
-    const digits = document.getElementById('f-mvola').value.replace(/[^0-9]/g, '');
-    const TOTAL  = 22;
-    if (digits.length < TOTAL) return null;
-    const m = digits.substring(0,10);
-    const c = digits.substring(10,22);
-    return m.substring(0,3)+' '+m.substring(3,5)+' '+m.substring(5,8)+' '+m.substring(8,10)
-         + ' / '
-         + c.substring(0,3)+' '+c.substring(3,6)+' '+c.substring(6,9)+' '+c.substring(9,12);
-  }
-
-  // ---- Chargement formations ----
-  window.addEventListener('load', function() { chargerFormations(); });
-
-  function chargerFormations() {
-    if (GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") {
-      document.getElementById('warn-formations').style.display = 'block';
-      document.getElementById('f-formation').innerHTML = '<option value="">— URL non configurée —</option>';
-      document.getElementById('formation-hint').textContent = 'Configurez GOOGLE_SCRIPT_URL dans le fichier HTML';
-      return;
-    }
-    jsonp(GOOGLE_SCRIPT_URL + '?action=getFormations', function(data) {
-      const sel  = document.getElementById('f-formation');
-      const hint = document.getElementById('formation-hint');
-      if (data && data.status === 'success' && data.formations.length > 0) {
-        sel.innerHTML = '<option value="">— Choisir la formation —</option>';
-        data.formations.forEach(f => { const o = document.createElement('option'); o.value=f; o.textContent=f; sel.appendChild(o); });
-        sel.disabled = false;
-        hint.textContent = data.formations.length + ' formation(s) disponible(s)';
-      } else {
-        sel.innerHTML = '<option value="">— Aucune formation trouvée —</option>';
-        hint.textContent = 'Ajoutez des formations dans l\'onglet "Formations" du Google Sheet';
-        document.getElementById('warn-formations').style.display = 'block';
-      }
-    });
-  }
-
-  function onFormationChange() {
-    const val = document.getElementById('f-formation').value;
-    const banner  = document.getElementById('formation-banner');
-    const section = document.getElementById('participants-section');
-    if (val) {
-      document.getElementById('formation-banner-text').textContent = val;
-      banner.style.display = 'flex';
-      formationSelectionnee = val;
-      section.style.display = 'block';
-      chargerParticipants();
+function chargerFormations() {
+  jsonp(GOOGLE_SCRIPT_URL + '?action=getFormations', function(data) {
+    const sel  = document.getElementById('f-formation');
+    const hint = document.getElementById('formation-hint');
+    if (data && data.status === 'success' && data.formations.length > 0) {
+      sel.innerHTML = '<option value="">— Choisir la formation —</option>';
+      data.formations.forEach(f => { const o = document.createElement('option'); o.value=f; o.textContent=f; sel.appendChild(o); });
+      sel.disabled = false;
+      hint.textContent = data.formations.length + ' formation(s) disponible(s)';
     } else {
-      banner.style.display = 'none';
-      section.style.display = 'none';
-      formationSelectionnee = '';
+      sel.innerHTML = '<option value="">— Aucune formation trouvée —</option>';
+      document.getElementById('warn-formations').style.display = 'block';
     }
-  }
+  });
+}
 
-  function chargerParticipants() {
-    if (!formationSelectionnee || GOOGLE_SCRIPT_URL === "VOTRE_URL_ICI") return;
-    const tbody = document.getElementById('participants-tbody');
-    tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Chargement...</td></tr>';
-    jsonp(GOOGLE_SCRIPT_URL + '?action=getParticipants&formation=' + encodeURIComponent(formationSelectionnee), function(data) {
-      if (data && data.status === 'success' && data.participants && data.participants.length > 0) {
-        document.getElementById('participants-count').textContent = data.participants.length;
-        tbody.innerHTML = data.participants.map(p =>
-          '<tr><td>'+esc(p.numero)+'</td><td>'+esc(p.nom)+'</td><td>'+esc(p.formation)+'</td><td>'+esc(p.region)+'</td><td>'+esc(p.fonction)+'</td></tr>'
-        ).join('');
-      } else {
-        document.getElementById('participants-count').textContent = '0';
-        tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Aucun participant inscrit pour cette formation</td></tr>';
-      }
+function onFormationChange() {
+  const val = document.getElementById('f-formation').value;
+  const banner = document.getElementById('formation-banner');
+  const section = document.getElementById('participants-section');
+  if (val) {
+    document.getElementById('formation-banner-text').textContent = val;
+    banner.style.display = 'flex'; formationSelectionnee = val;
+    section.style.display = 'block'; chargerParticipants();
+  } else {
+    banner.style.display = 'none'; section.style.display = 'none'; formationSelectionnee = '';
+  }
+}
+
+function chargerParticipants() {
+  if (!formationSelectionnee) return;
+  const tbody = document.getElementById('participants-tbody');
+  tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Chargement...</td></tr>';
+  jsonp(GOOGLE_SCRIPT_URL + '?action=getParticipants&formation=' + encodeURIComponent(formationSelectionnee), function(data) {
+    if (data && data.status === 'success' && data.participants && data.participants.length > 0) {
+      document.getElementById('participants-count').textContent = data.participants.length;
+      tbody.innerHTML = data.participants.map(p =>
+        '<tr><td>'+esc(p.numero)+'</td><td>'+esc(p.nom)+'</td><td>'+esc(p.formation)+'</td><td>'+esc(p.region)+'</td><td>'+esc(p.fonction)+'</td></tr>'
+      ).join('');
+    } else {
+      document.getElementById('participants-count').textContent = '0';
+      tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Aucun participant inscrit</td></tr>';
+    }
+  });
+}
+
+function chargerDistricts() {
+  const region = document.getElementById('f-region').value;
+  const sel = document.getElementById('f-district');
+  const hint = document.getElementById('district-hint');
+  sel.innerHTML = '';
+  if (!region) { sel.disabled=true; sel.innerHTML='<option value="">— Choisir la région d\'abord —</option>'; hint.textContent='Sélectionnez d\'abord une région'; return; }
+  const districts = DISTRICTS[region] || [];
+  sel.disabled = false;
+  sel.innerHTML = '<option value="">— Choisir le district —</option>';
+  districts.forEach(d => { const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
+  hint.textContent = districts.length + ' district(s)';
+}
+
+// Mvola formatting
+(function() {
+  const MVOLA_LEN=10, CIN_LEN=12, TOTAL=22;
+  function fmtMvola(d) { let r=''; if(d.length>0)r+=d.substring(0,3); if(d.length>3)r+=' '+d.substring(3,5); if(d.length>5)r+=' '+d.substring(5,8); if(d.length>8)r+=' '+d.substring(8,10); return r; }
+  function fmtCIN(d)   { let r=''; if(d.length>0)r+=d.substring(0,3); if(d.length>3)r+=' '+d.substring(3,6); if(d.length>6)r+=' '+d.substring(6,9); if(d.length>9)r+=' '+d.substring(9,12); return r; }
+  function build(digits) { const m=digits.substring(0,MVOLA_LEN),c=digits.substring(MVOLA_LEN); let r=fmtMvola(m); if(digits.length>=MVOLA_LEN) r+=' / '+fmtCIN(c); return r; }
+  function getDigits(v){ return v.replace(/[^0-9]/g,''); }
+  window.addEventListener('DOMContentLoaded', function() {
+    const input=document.getElementById('f-mvola'), prog=document.getElementById('mvola-prog');
+    if(!input) return;
+    input.addEventListener('keydown', function(e){ const ctrl=['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End']; if(ctrl.includes(e.key)||e.ctrlKey||e.metaKey)return; if(/[0-9\/]/.test(e.key))return; e.preventDefault(); });
+    input.addEventListener('input', function() {
+      const cursor=this.selectionStart, oldVal=this.value, digits=getDigits(oldVal).substring(0,TOTAL), formatted=build(digits);
+      const dbc=getDigits(oldVal.substring(0,cursor)).length;
+      this.value=formatted;
+      let nc=0,dc=0; for(let i=0;i<formatted.length;i++){if(dc>=dbc)break;if(/[0-9]/.test(formatted[i]))dc++;nc=i+1;} this.setSelectionRange(nc,nc);
+      const n=digits.length;
+      if(n===TOTAL){this.classList.add('mvola-valid');prog.textContent='✓ Format complet';prog.style.color='#059669';}
+      else{this.classList.remove('mvola-valid');prog.textContent=n<MVOLA_LEN?'Mvola : '+n+'/10 chiffres':'Mvola ✓ — CIN : '+(n-MVOLA_LEN)+'/12 chiffres';prog.style.color='#6b7280';}
     });
-  }
+  });
+  window.getMvolaFormatted = function() {
+    const digits=document.getElementById('f-mvola').value.replace(/[^0-9]/g,'');
+    if(digits.length<TOTAL) return null;
+    const m=digits.substring(0,10),c=digits.substring(10,22);
+    return m.substring(0,3)+' '+m.substring(3,5)+' '+m.substring(5,8)+' '+m.substring(8,10)+' / '+c.substring(0,3)+' '+c.substring(3,6)+' '+c.substring(6,9)+' '+c.substring(9,12);
+  };
+})();
 
-  function chargerDistricts() {
-    const region = document.getElementById('f-region').value;
-    const sel    = document.getElementById('f-district');
-    const hint   = document.getElementById('district-hint');
-    sel.innerHTML = '';
-    if (!region) { sel.disabled=true; sel.innerHTML='<option value="">— Choisir la région d\'abord —</option>'; hint.textContent='Sélectionnez d\'abord une région'; return; }
-    const districts = DISTRICTS[region] || [];
-    sel.disabled = false;
-    sel.innerHTML = '<option value="">— Choisir le district —</option>';
-    districts.forEach(d => { const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
-    hint.textContent = districts.length + ' district(s) disponible(s)';
-  }
+// Signature
+(function(){
+  let drawing=false,hasSig=false,canvas,ctx;
+  window.addEventListener('DOMContentLoaded',function(){
+    canvas=document.getElementById('sig-canvas'); if(!canvas)return;
+    const dpr=window.devicePixelRatio||1,rect=canvas.getBoundingClientRect();
+    canvas.width=(rect.width||500)*dpr; canvas.height=(rect.height||120)*dpr;
+    ctx=canvas.getContext('2d'); ctx.scale(dpr,dpr);
+    ctx.strokeStyle='#1a1a2e'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round';
+    function pos(e){const r=canvas.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+    function start(e){e.preventDefault();drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);if(!hasSig){hasSig=true;document.getElementById('sig-placeholder').style.display='none';document.getElementById('sig-clear').style.display='inline-flex';document.getElementById('sig-status').textContent='Signature en cours...';document.getElementById('sig-status').style.color='#1a56db';}}
+    function move(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();ctx.beginPath();ctx.moveTo(p.x,p.y);}
+    function stop(){if(!drawing)return;drawing=false;document.getElementById('sig-status').textContent='✓ Signature enregistrée';document.getElementById('sig-status').style.color='#059669';}
+    canvas.addEventListener('mousedown',start); canvas.addEventListener('mousemove',move);
+    canvas.addEventListener('mouseup',stop);    canvas.addEventListener('mouseleave',stop);
+    canvas.addEventListener('touchstart',start,{passive:false}); canvas.addEventListener('touchmove',move,{passive:false});
+    canvas.addEventListener('touchend',stop);
+  });
+  window.clearSig=function(){if(!ctx)return;ctx.clearRect(0,0,canvas.width,canvas.height);hasSig=false;document.getElementById('sig-placeholder').style.display='block';document.getElementById('sig-clear').style.display='none';document.getElementById('sig-status').textContent='En attente de signature';document.getElementById('sig-status').style.color='#9ca3af';};
+  window.getSignatureB64=function(){if(!canvas||!hasSig)return'';return canvas.toDataURL('image/png');};
+})();
 
-  function soumettre() {
-    const formation = document.getElementById('f-formation').value;
-    const nom       = document.getElementById('f-nom').value.trim();
-    const region    = document.getElementById('f-region').value;
-    const district  = document.getElementById('f-district').value;
-    const fonction  = document.getElementById('f-fonction').value.trim();
-    const mvola     = getMvolaFormatted();
-    const errBox    = document.getElementById('error-box');
-    const doublonBox = document.getElementById('doublon-box');
-
-    doublonBox.style.display = 'none';
-    errBox.style.display = 'none';
-
-    if (!formation || !nom || !region || !district || !fonction) {
-      errBox.style.display = 'block'; errBox.textContent = 'Veuillez remplir tous les champs obligatoires.'; return;
+function soumettre() {
+  const formation=document.getElementById('f-formation').value, nom=document.getElementById('f-nom').value.trim(),
+        region=document.getElementById('f-region').value, district=document.getElementById('f-district').value,
+        fonction=document.getElementById('f-fonction').value.trim(), mvola=getMvolaFormatted();
+  const errBox=document.getElementById('error-box'), doublonBox=document.getElementById('doublon-box');
+  doublonBox.style.display='none'; errBox.style.display='none';
+  if(!formation||!nom||!region||!district||!fonction){errBox.style.display='block';errBox.textContent='Veuillez remplir tous les champs obligatoires.';return;}
+  if(!mvola){errBox.style.display='block';errBox.textContent='Le N° Mvola+CIN doit contenir 22 chiffres au total.';return;}
+  const btn=document.getElementById('btn-submit'),label=document.getElementById('btn-label'),spinner=document.getElementById('spinner');
+  btn.disabled=true;label.textContent='Enregistrement...';spinner.style.display='block';
+  const now=new Date(), dateHeure=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR');
+  const sigB64=window.getSignatureB64?window.getSignatureB64():'';
+  const url=GOOGLE_SCRIPT_URL+'?action=enregistrer&formation='+encodeURIComponent(formation)+'&nom='+encodeURIComponent(nom)+'&region='+encodeURIComponent(region)+'&district='+encodeURIComponent(district)+'&fonction='+encodeURIComponent(fonction)+'&mvola='+encodeURIComponent(mvola)+'&signature='+encodeURIComponent(sigB64)+'&date_heure='+encodeURIComponent(dateHeure);
+  jsonp(url,function(data){
+    btn.disabled=false;label.textContent='Enregistrer ma présence';spinner.style.display='none';
+    if(data&&data.status==='success'){
+      document.getElementById('form-section').style.display='none';
+      document.getElementById('success-box').style.display='block';
+      document.getElementById('success-name').textContent=nom;
+      document.getElementById('success-numero').textContent='N° '+(data.numero||'');
+      document.getElementById('s-formation').textContent=formation;
+      document.getElementById('s-region').textContent=region;
+      document.getElementById('s-district').textContent=district;
+      document.getElementById('s-fonction').textContent=fonction;
+    } else if(data&&data.status==='doublon'){
+      doublonBox.style.display='block';
+    } else {
+      errBox.style.display='block';errBox.textContent='Erreur de connexion. Vérifiez votre URL Google Script.';
     }
-    if (!mvola) {
-      errBox.style.display = 'block'; errBox.textContent = 'Le N° Mvola et CIN doit contenir 23 chiffres au total (10 pour Mvola + 12 pour CIN + 1 séparateur).'; return;
+  });
+}
+
+function nouveau() {
+  document.getElementById('success-box').style.display='none';
+  document.getElementById('form-section').style.display='block';
+  document.getElementById('participants-section').style.display='none';
+  document.getElementById('formation-banner').style.display='none';
+  document.getElementById('doublon-box').style.display='none';
+  ['f-nom','f-fonction'].forEach(id=>document.getElementById(id).value='');
+  const mvola=document.getElementById('f-mvola');
+  mvola.value='';mvola.classList.remove('mvola-valid');document.getElementById('mvola-prog').textContent='';
+  document.getElementById('f-formation').value='';
+  document.getElementById('f-region').value='';
+  document.getElementById('f-district').innerHTML='<option value="">— Choisir la région d\'abord —</option>';
+  document.getElementById('f-district').disabled=true;
+  document.getElementById('district-hint').textContent='Sélectionnez d\'abord une région';
+  formationSelectionnee=''; clearSig();
+}
+
+// ========================================================
+// PAGE 2 — ÉDITEUR BASE-UTILISATEURS
+// ========================================================
+const ED_LISTES = { entite:[], niveau:[], poste:[], genre:['Masculin','Féminin'], age:['21 - 30','31 - 40','41 - 50','51 - 60','61 et plus'] };
+let edAllData=[], edFiltered=[], showMissing=false, currentRow=null;
+
+function rechargerBase() {
+  document.getElementById('ed-tbody').innerHTML='<tr><td colspan="11" class="no-results2">Chargement...</td></tr>';
+  jsonp(GOOGLE_SCRIPT_URL+'?action=getBaseUtilisateurs', function(data) {
+    if(data&&data.status==='success'){
+      edAllData=data.rows;
+      if(data.listes){ED_LISTES.entite=data.listes.entite||[];ED_LISTES.niveau=data.listes.niveau||[];ED_LISTES.poste=data.listes.poste||[];}
+      peuplerListesModal();
+      appliquerFiltresBase();
+      updateStatsBase();
+      document.getElementById('ed-sheet-info').textContent=edAllData.length+' utilisateurs — Base-Utilisateurs';
+    } else {
+      showToast('Erreur de chargement de la base.',true);
+      document.getElementById('ed-tbody').innerHTML='<tr><td colspan="11" class="no-results2">Erreur de chargement</td></tr>';
     }
+  });
+}
 
-    const btn = document.getElementById('btn-submit');
-    const label = document.getElementById('btn-label');
-    const spinner = document.getElementById('spinner');
-    btn.disabled=true; label.textContent='Enregistrement...'; spinner.style.display='block';
+function isMiss(r){ return !r.entite||!r.niveau||!r.poste||!r.genre||!r.age; }
 
-    const now = new Date();
-    const dateHeure = now.toLocaleDateString('fr-FR') + ' ' + now.toLocaleTimeString('fr-FR');
-    const url = GOOGLE_SCRIPT_URL +
-      '?action=enregistrer' +
-      '&formation=' + encodeURIComponent(formation) +
-      '&nom='       + encodeURIComponent(nom) +
-      '&region='    + encodeURIComponent(region) +
-      '&district='  + encodeURIComponent(district) +
-      '&fonction='  + encodeURIComponent(fonction) +
-      '&mvola='     + encodeURIComponent(mvola) +
-      '&date_heure='+ encodeURIComponent(dateHeure);
+function updateStatsBase(){
+  const total=edAllData.length, missing=edAllData.filter(isMiss).length;
+  document.getElementById('stat-total').textContent=total;
+  document.getElementById('stat-missing').textContent=missing;
+  document.getElementById('stat-ok').textContent=total-missing;
+}
 
-    jsonp(url, function(data) {
-      btn.disabled=false; label.textContent='Enregistrer ma présence'; spinner.style.display='none';
-      if (data && data.status === 'success') {
-        document.getElementById('form-section').style.display = 'none';
-        document.getElementById('success-box').style.display  = 'block';
-        document.getElementById('success-name').textContent   = nom;
-        document.getElementById('success-numero').textContent = 'N° ' + (data.numero || '');
-        document.getElementById('s-formation').textContent    = formation;
-        document.getElementById('s-region').textContent       = region;
-        document.getElementById('s-district').textContent     = district;
-        document.getElementById('s-fonction').textContent     = fonction;
-      } else if (data && data.status === 'doublon') {
-        doublonBox.style.display = 'block';
-      } else {
-        errBox.style.display = 'block';
-        errBox.textContent = 'Erreur d\'enregistrement. Vérifiez votre URL Google Script.';
-      }
-    });
+function toggleMissing(){
+  showMissing=!showMissing;
+  const btn=document.getElementById('btn-missing');
+  btn.textContent=showMissing?'✕ Tout afficher':'⚠ Afficher manquants';
+  btn.className='btn-ed '+(showMissing?'btn-blue':'btn-orange');
+  appliquerFiltresBase();
+}
+
+function filtrerBase(){ appliquerFiltresBase(); }
+
+function appliquerFiltresBase(){
+  const q=document.getElementById('ed-search').value.toLowerCase().trim();
+  edFiltered=edAllData.filter(r=>{
+    const ms=!q||r.nom.toLowerCase().includes(q)||r.region.toLowerCase().includes(q)||r.district.toLowerCase().includes(q)||r.email.toLowerCase().includes(q);
+    return ms&&(!showMissing||isMiss(r));
+  });
+  document.getElementById('ed-result-count').textContent=edFiltered.length+' résultat(s)';
+  renderBaseTable();
+}
+
+function renderBaseTable(){
+  const tbody=document.getElementById('ed-tbody');
+  if(!edFiltered.length){tbody.innerHTML='<tr><td colspan="11" class="no-results2">Aucun résultat</td></tr>';return;}
+  tbody.innerHTML=edFiltered.map((r,i)=>{
+    const miss=isMiss(r), cls=miss?'row-missing':'';
+    const badge=miss?'<span class="badge-miss">⚠ Incomplet</span>':'<span class="badge-ok2">✓ Complet</span>';
+    const idx=edAllData.indexOf(r);
+    return `<tr class="${cls}" ondblclick="ouvrirModal(${idx})" title="Double-cliquez pour modifier">
+      <td>${i+1}</td>
+      <td>${esc(r.region)}</td><td>${esc(r.district)}</td>
+      <td style="font-weight:600;">${esc(r.nom)}</td>
+      <td class="${r.email?'':'cell-miss'}">${r.email||'—'}</td>
+      <td class="${r.entite?'':'cell-miss'}">${r.entite||'—'}</td>
+      <td class="${r.niveau?'':'cell-miss'}">${r.niveau||'—'}</td>
+      <td class="${r.poste?'':'cell-miss'}">${r.poste||'—'}</td>
+      <td class="${r.genre?'':'cell-miss'}">${r.genre||'—'}</td>
+      <td class="${r.age?'':'cell-miss'}">${r.age||'—'}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+function peuplerListesModal(){
+  const fields={'m-entite':ED_LISTES.entite,'m-niveau':ED_LISTES.niveau,'m-poste':ED_LISTES.poste,'m-genre':ED_LISTES.genre,'m-age':ED_LISTES.age};
+  for(const [id,vals] of Object.entries(fields)){
+    const sel=document.getElementById(id), cur=sel.value;
+    sel.innerHTML='<option value="">— Choisir —</option>';
+    vals.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o);});
+    if(cur) sel.value=cur;
   }
+}
 
-  function esc(t) { return t ? String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function ouvrirModal(idx){
+  currentRow=idx;
+  const r=edAllData[idx];
+  document.getElementById('modal-title').textContent='Modifier l\'utilisateur';
+  document.getElementById('modal-subtitle').textContent=r.nom;
+  document.getElementById('m-region').value=r.region;
+  document.getElementById('m-district').value=r.district;
+  document.getElementById('m-nom').value=r.nom;
+  document.getElementById('m-email').value=r.email||'';
+  document.getElementById('m-tel').value=r.tel||'';
+  document.getElementById('m-entite').value=r.entite||'';
+  document.getElementById('m-niveau').value=r.niveau||'';
+  document.getElementById('m-poste').value=r.poste||'';
+  document.getElementById('m-genre').value=r.genre||'';
+  document.getElementById('m-age').value=r.age||'';
+  const fields={'m-entite':r.entite,'m-niveau':r.niveau,'m-poste':r.poste,'m-genre':r.genre,'m-age':r.age};
+  let hasMiss=false;
+  for(const [id,val] of Object.entries(fields)){const el=document.getElementById(id);if(!val){el.classList.add('field-miss');hasMiss=true;}else el.classList.remove('field-miss');}
+  document.getElementById('miss-warn').style.display=hasMiss?'block':'none';
+  document.getElementById('modal-overlay').classList.add('active');
+}
 
-  function nouveau() {
-    document.getElementById('success-box').style.display  = 'none';
-    document.getElementById('form-section').style.display = 'block';
-    document.getElementById('participants-section').style.display = 'none';
-    document.getElementById('formation-banner').style.display = 'none';
-    document.getElementById('doublon-box').style.display = 'none';
-    ['f-nom','f-fonction'].forEach(id => document.getElementById(id).value = '');
-    const mvola = document.getElementById('f-mvola');
-    mvola.value = ''; mvola.classList.remove('mvola-valid');
-    document.getElementById('mvola-prog').textContent = '';
-    document.getElementById('f-formation').value = '';
-    document.getElementById('f-region').value = '';
-    document.getElementById('f-district').innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
-    document.getElementById('f-district').disabled = true;
-    document.getElementById('district-hint').textContent = 'Sélectionnez d\'abord une région';
-    formationSelectionnee = '';
-  }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('active'); currentRow=null; }
+function closeModalOnOverlay(e){ if(e.target===document.getElementById('modal-overlay'))closeModal(); }
+
+function sauvegarderBase(){
+  if(currentRow===null)return;
+  const r=edAllData[currentRow];
+  const updates={id:r.id,email:document.getElementById('m-email').value.trim(),tel:document.getElementById('m-tel').value.trim(),entite:document.getElementById('m-entite').value,niveau:document.getElementById('m-niveau').value,poste:document.getElementById('m-poste').value,genre:document.getElementById('m-genre').value,age:document.getElementById('m-age').value};
+  Object.assign(r,{email:updates.email,tel:updates.tel,entite:updates.entite,niveau:updates.niveau,poste:updates.poste,genre:updates.genre,age:updates.age});
+  const btn=document.getElementById('btn-save'),spinner=document.getElementById('save-spinner');
+  btn.disabled=true;spinner.style.display='inline-block';
+  const params=Object.entries(updates).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+  jsonp(GOOGLE_SCRIPT_URL+'?action=updateRow&'+params, function(data){
+    btn.disabled=false;spinner.style.display='none';
+    if(data&&data.status==='success'){closeModal();appliquerFiltresBase();updateStatsBase();showToast('✓ Modifications enregistrées');}
+    else showToast('Erreur lors de l\'enregistrement',true);
+  });
+}
+
+function showToast(msg,error=false){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(error?' error':'');
+  setTimeout(()=>{t.className='toast';},3500);
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 </script>
 </body>
 </html>
