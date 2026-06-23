@@ -141,7 +141,7 @@
     <div class="form-group">
       <label>N° Mvola et CIN <span class="req">*</span></label>
       <div class="mvola-wrap">
-        <input type="tel" id="f-mvola" placeholder="034 56 789 01 / 123 456 789 012" maxlength="28" />
+        <input type="tel" id="f-mvola" placeholder="034 56 789 01 / 123 456 789 012" maxlength="32" />
         <div class="mvola-prog" id="mvola-prog"></div>
         <div class="mvola-hint">Tapez uniquement les chiffres — le format <strong>XXX XX XXX XX / XXX XXX XXX XXX</strong> s'applique automatiquement</div>
       </div>
@@ -253,18 +253,40 @@
   }
 
   // ---- Formatage Mvola en temps réel dans le champ ----
+  // Mvola : 10 chiffres → XXX XX XXX XX
+  // CIN   : 12 chiffres → XXX XXX XXX XXX
+  // Total : 22 chiffres + séparateur " / " automatique
+  // L'utilisateur peut taper "/" manuellement — il sera accepté et positionné correctement
   (function() {
-    const GROUPS = [3,2,3,2,3,3,3,3]; // Mvola: 4 groupes, CIN: 4 groupes
+    const MVOLA_LEN = 10;
+    const CIN_LEN   = 12;
+    const TOTAL     = MVOLA_LEN + CIN_LEN; // 22
+
+    function formatMvola(digits) {
+      const d = digits.substring(0, MVOLA_LEN);
+      let r = '';
+      if (d.length > 0) r += d.substring(0,3);
+      if (d.length > 3) r += ' ' + d.substring(3,5);
+      if (d.length > 5) r += ' ' + d.substring(5,8);
+      if (d.length > 8) r += ' ' + d.substring(8,10);
+      return r;
+    }
+
+    function formatCIN(digits) {
+      const d = digits.substring(0, CIN_LEN);
+      let r = '';
+      if (d.length > 0) r += d.substring(0,3);
+      if (d.length > 3) r += ' ' + d.substring(3,6);
+      if (d.length > 6) r += ' ' + d.substring(6,9);
+      if (d.length > 9) r += ' ' + d.substring(9,12);
+      return r;
+    }
 
     function buildFormatted(digits) {
-      let result = '', pos = 0;
-      for (let g = 0; g < GROUPS.length; g++) {
-        if (pos >= digits.length) break;
-        if (g === 4) result += ' / ';
-        else if (g > 0) result += ' ';
-        result += digits.substring(pos, pos + GROUPS[g]);
-        pos += GROUPS[g];
-      }
+      const mPart = digits.substring(0, MVOLA_LEN);
+      const cPart = digits.substring(MVOLA_LEN);
+      let result  = formatMvola(mPart);
+      if (digits.length >= MVOLA_LEN) result += ' / ' + formatCIN(cPart);
       return result;
     }
 
@@ -275,22 +297,26 @@
       const prog  = document.getElementById('mvola-prog');
       if (!input) return;
 
+      // Autoriser chiffres ET "/"
       input.addEventListener('keydown', function(e) {
         const ctrl = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
         if (ctrl.includes(e.key) || e.ctrlKey || e.metaKey) return;
-        if (!/[0-9]/.test(e.key)) e.preventDefault();
+        // Accepter chiffres et "/"
+        if (/[0-9\/]/.test(e.key)) return;
+        e.preventDefault();
       });
 
       input.addEventListener('input', function() {
-        const cursor  = this.selectionStart;
-        const oldVal  = this.value;
-        const digits  = getDigits(oldVal).substring(0, 22);
+        const cursor = this.selectionStart;
+        const oldVal = this.value;
+        // Extraire les chiffres uniquement (ignorer espaces, slash saisis)
+        const digits = getDigits(oldVal).substring(0, TOTAL);
         const formatted = buildFormatted(digits);
         const digitsBeforeCursor = getDigits(oldVal.substring(0, cursor)).length;
 
         this.value = formatted;
 
-        // Repositionner le curseur
+        // Repositionner le curseur après reformatage
         let newCursor = 0, dc = 0;
         for (let i = 0; i < formatted.length; i++) {
           if (dc >= digitsBeforeCursor) break;
@@ -299,17 +325,19 @@
         }
         this.setSelectionRange(newCursor, newCursor);
 
-        // Indicateur progression
+        // Indicateur de progression
         const n = digits.length;
-        if (n === 22) {
+        if (n === TOTAL) {
           this.classList.add('mvola-valid');
-          prog.textContent = '✓ Format complet';
+          prog.textContent = '✓ Format complet — ' + MVOLA_LEN + ' chiffres Mvola + ' + CIN_LEN + ' chiffres CIN';
           prog.style.color = '#059669';
         } else {
           this.classList.remove('mvola-valid');
-          prog.textContent = n < 10
-            ? 'Mvola : ' + n + '/10 chiffres'
-            : 'Mvola ✓ — CIN : ' + (n-10) + '/12 chiffres';
+          if (n < MVOLA_LEN) {
+            prog.textContent = 'Mvola : ' + n + '/' + MVOLA_LEN + ' chiffres';
+          } else {
+            prog.textContent = 'Mvola ✓ — CIN : ' + (n - MVOLA_LEN) + '/' + CIN_LEN + ' chiffres';
+          }
           prog.style.color = '#6b7280';
         }
       });
@@ -317,9 +345,9 @@
   })();
 
   function getMvolaFormatted() {
-    const val    = document.getElementById('f-mvola').value;
-    const digits = val.replace(/[^0-9]/g, '');
-    if (digits.length < 22) return null;
+    const digits = document.getElementById('f-mvola').value.replace(/[^0-9]/g, '');
+    const TOTAL  = 22;
+    if (digits.length < TOTAL) return null;
     const m = digits.substring(0,10);
     const c = digits.substring(10,22);
     return m.substring(0,3)+' '+m.substring(3,5)+' '+m.substring(5,8)+' '+m.substring(8,10)
