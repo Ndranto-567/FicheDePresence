@@ -28,12 +28,10 @@
   .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
   /* Champ Mvola */
-  .mvola-wrap { position: relative; }
-  .mvola-wrap input { letter-spacing: 0.05em; font-family: monospace; font-size: 0.95rem; }
-  .mvola-preview { font-size: 0.78rem; color: #1a56db; margin-top: 4px; font-family: monospace; font-weight: 600; min-height: 16px; }
+  .mvola-wrap input { font-family: monospace; font-size: 1rem; letter-spacing: 0.08em; }
+  .mvola-valid  { border-color: #059669 !important; box-shadow: 0 0 0 3px rgba(5,150,105,0.12) !important; }
+  .mvola-prog { font-size: 0.75rem; color: #6b7280; margin-top: 4px; }
   .mvola-hint { font-size: 0.75rem; color: #9ca3af; margin-top: 2px; }
-  .mvola-valid { border-color: #059669 !important; }
-  .mvola-invalid { border-color: #dc2626 !important; }
 
   .btn { width: 100%; padding: 12px; background: #1a56db; color: #fff; border: none; border-radius: 9px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: background 0.2s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 8px; }
   .btn:hover { background: #1648c0; }
@@ -143,9 +141,9 @@
     <div class="form-group">
       <label>N° Mvola et CIN <span class="req">*</span></label>
       <div class="mvola-wrap">
-        <input type="tel" id="f-mvola" placeholder="Tapez uniquement les chiffres" maxlength="30" oninput="formatMvola(this)" />
-        <div class="mvola-preview" id="mvola-preview"></div>
-        <div class="mvola-hint">Format : <strong>XXX XX XXX XX</strong> / <strong>XXX XXX XXX XXX</strong> — chiffres uniquement</div>
+        <input type="tel" id="f-mvola" placeholder="034 56 789 01 / 123 456 789 012" maxlength="28" />
+        <div class="mvola-prog" id="mvola-prog"></div>
+        <div class="mvola-hint">Tapez uniquement les chiffres — le format <strong>XXX XX XXX XX / XXX XXX XXX XXX</strong> s'applique automatiquement</div>
       </div>
     </div>
 
@@ -212,7 +210,7 @@
   // =====================================================
   // REMPLACEZ CETTE URL PAR VOTRE URL GOOGLE APPS SCRIPT
   // =====================================================
-  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxv54Gr4ql6KpUafsEqY31j8gseyB_npcMbgFJKF7O-5PcTCJNaW2Jw7PFTReeaahWx/exec";
+  const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/1aet18aNvzBhyaC0YBflqWEzuMhQ-ujzDerY30Dp3lcNuaXcjKavAUYF0/3";
   // =====================================================
 
   const DISTRICTS = {
@@ -254,59 +252,79 @@
     document.head.appendChild(script);
   }
 
-  // ---- Formatage Mvola ----
-  function formatMvola(input) {
-    // Garder uniquement les chiffres
-    const digits = input.value.replace(/\D/g, '').substring(0, 23);
-    input.value = digits;
-    const preview = document.getElementById('mvola-preview');
+  // ---- Formatage Mvola en temps réel dans le champ ----
+  (function() {
+    const GROUPS = [3,2,3,2,3,3,3,3]; // Mvola: 4 groupes, CIN: 4 groupes
 
-    // Format Mvola : XXX XX XXX XX (10 chiffres)
-    // Format CIN   : XXX XXX XXX XXX (12 chiffres)
-    let mvola = '', cin = '', display = '';
-
-    if (digits.length <= 10) {
-      // Formatage Mvola uniquement
-      const d = digits;
-      if (d.length > 0) mvola += d.substring(0,3);
-      if (d.length > 3) mvola += ' ' + d.substring(3,5);
-      if (d.length > 5) mvola += ' ' + d.substring(5,8);
-      if (d.length > 8) mvola += ' ' + d.substring(8,10);
-      display = mvola;
-    } else {
-      // Mvola complet + CIN
-      const m = digits.substring(0,10);
-      mvola = m.substring(0,3) + ' ' + m.substring(3,5) + ' ' + m.substring(5,8) + ' ' + m.substring(8,10);
-      const c = digits.substring(10);
-      if (c.length > 0) cin += c.substring(0,3);
-      if (c.length > 3) cin += ' ' + c.substring(3,6);
-      if (c.length > 6) cin += ' ' + c.substring(6,9);
-      if (c.length > 9) cin += ' ' + c.substring(9,12);
-      display = mvola + ' / ' + cin;
+    function buildFormatted(digits) {
+      let result = '', pos = 0;
+      for (let g = 0; g < GROUPS.length; g++) {
+        if (pos >= digits.length) break;
+        if (g === 4) result += ' / ';
+        else if (g > 0) result += ' ';
+        result += digits.substring(pos, pos + GROUPS[g]);
+        pos += GROUPS[g];
+      }
+      return result;
     }
 
-    preview.textContent = display ? '→ ' + display : '';
+    function getDigits(val) { return val.replace(/[^0-9]/g, ''); }
 
-    // Validation visuelle
-    if (digits.length === 23) {
-      input.classList.add('mvola-valid'); input.classList.remove('mvola-invalid');
-      preview.style.color = '#059669';
-    } else if (digits.length > 0) {
-      input.classList.remove('mvola-valid'); input.classList.remove('mvola-invalid');
-      preview.style.color = '#1a56db';
-    } else {
-      input.classList.remove('mvola-valid','mvola-invalid');
-    }
-  }
+    window.addEventListener('DOMContentLoaded', function() {
+      const input = document.getElementById('f-mvola');
+      const prog  = document.getElementById('mvola-prog');
+      if (!input) return;
+
+      input.addEventListener('keydown', function(e) {
+        const ctrl = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+        if (ctrl.includes(e.key) || e.ctrlKey || e.metaKey) return;
+        if (!/[0-9]/.test(e.key)) e.preventDefault();
+      });
+
+      input.addEventListener('input', function() {
+        const cursor  = this.selectionStart;
+        const oldVal  = this.value;
+        const digits  = getDigits(oldVal).substring(0, 22);
+        const formatted = buildFormatted(digits);
+        const digitsBeforeCursor = getDigits(oldVal.substring(0, cursor)).length;
+
+        this.value = formatted;
+
+        // Repositionner le curseur
+        let newCursor = 0, dc = 0;
+        for (let i = 0; i < formatted.length; i++) {
+          if (dc >= digitsBeforeCursor) break;
+          if (/[0-9]/.test(formatted[i])) dc++;
+          newCursor = i + 1;
+        }
+        this.setSelectionRange(newCursor, newCursor);
+
+        // Indicateur progression
+        const n = digits.length;
+        if (n === 22) {
+          this.classList.add('mvola-valid');
+          prog.textContent = '✓ Format complet';
+          prog.style.color = '#059669';
+        } else {
+          this.classList.remove('mvola-valid');
+          prog.textContent = n < 10
+            ? 'Mvola : ' + n + '/10 chiffres'
+            : 'Mvola ✓ — CIN : ' + (n-10) + '/12 chiffres';
+          prog.style.color = '#6b7280';
+        }
+      });
+    });
+  })();
 
   function getMvolaFormatted() {
-    const digits = document.getElementById('f-mvola').value.replace(/\D/g,'');
-    if (digits.length < 23) return null;
+    const val    = document.getElementById('f-mvola').value;
+    const digits = val.replace(/[^0-9]/g, '');
+    if (digits.length < 22) return null;
     const m = digits.substring(0,10);
     const c = digits.substring(10,22);
-    const mvola = m.substring(0,3)+' '+m.substring(3,5)+' '+m.substring(5,8)+' '+m.substring(8,10);
-    const cin   = c.substring(0,3)+' '+c.substring(3,6)+' '+c.substring(6,9)+' '+c.substring(9,12);
-    return mvola + ' / ' + cin;
+    return m.substring(0,3)+' '+m.substring(3,5)+' '+m.substring(5,8)+' '+m.substring(8,10)
+         + ' / '
+         + c.substring(0,3)+' '+c.substring(3,6)+' '+c.substring(6,9)+' '+c.substring(9,12);
   }
 
   // ---- Chargement formations ----
@@ -449,8 +467,8 @@
     document.getElementById('doublon-box').style.display = 'none';
     ['f-nom','f-fonction'].forEach(id => document.getElementById(id).value = '');
     const mvola = document.getElementById('f-mvola');
-    mvola.value = ''; mvola.classList.remove('mvola-valid','mvola-invalid');
-    document.getElementById('mvola-preview').textContent = '';
+    mvola.value = ''; mvola.classList.remove('mvola-valid');
+    document.getElementById('mvola-prog').textContent = '';
     document.getElementById('f-formation').value = '';
     document.getElementById('f-region').value = '';
     document.getElementById('f-district').innerHTML = '<option value="">— Choisir la région d\'abord —</option>';
