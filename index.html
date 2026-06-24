@@ -366,8 +366,30 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-heig
       <div class="miss-warn" id="miss-warn" style="display:none;">⚠ Certains champs sont manquants — veuillez les compléter.</div>
       <div class="m-section" id="m-section-base">Informations de base <span class="m-readonly" id="m-readonly-label">(lecture seule)</span></div>
       <div class="m-row-2">
-        <div class="m-form-group"><label>Région <span id="m-region-req" style="color:#e53e3e;display:none;">*</span></label><input type="text" id="m-region" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
-        <div class="m-form-group"><label>District <span id="m-district-req" style="color:#e53e3e;display:none;">*</span></label><input type="text" id="m-district" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+        <div class="m-form-group">
+          <label>Région <span id="m-region-req" style="color:#e53e3e;display:none;">*</span></label>
+          <input type="text" id="m-region" readonly style="background:#f3f4f6;color:#6b7280;" />
+          <select id="m-region-sel" style="display:none;" onchange="chargerDistrictsModal()">
+            <option value="">— Choisir —</option>
+            <option>Central</option>
+            <option>Analamanga</option><option>Vakinankaratra</option><option>Itasy</option>
+            <option>Bongolava</option><option>Haute Matsiatra</option><option>Amoron'i Mania</option>
+            <option>Vatovavy</option><option>Fitovinany</option><option>Ihorombe</option>
+            <option>Atsimo-Atsinanana</option><option>Atsinanana</option><option>Analanjirofo</option>
+            <option>Alaotra Mangoro</option><option>Boeny</option><option>Sofia</option>
+            <option>Betsiboka</option><option>Melaky</option><option>Atsimo-Andrefana</option>
+            <option>Androy</option><option>Anosy</option><option>Menabe</option>
+            <option>Diana</option><option>Sava</option>
+          </select>
+        </div>
+        <div class="m-form-group">
+          <label>District <span id="m-district-req" style="color:#e53e3e;display:none;">*</span></label>
+          <input type="text" id="m-district" readonly style="background:#f3f4f6;color:#6b7280;" />
+          <select id="m-district-sel" style="display:none;" disabled>
+            <option value="">— Choisir la région —</option>
+          </select>
+          <p class="hint" id="m-district-hint" style="display:none;">Sélectionnez d'abord une région</p>
+        </div>
       </div>
       <div class="m-form-group"><label>Nom et Prénom <span id="m-nom-req" style="color:#e53e3e;display:none;">*</span></label><input type="text" id="m-nom" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
       <div class="m-row-2">
@@ -502,6 +524,24 @@ function chargerParticipants() {
       tbody.innerHTML = '<tr><td colspan="5" class="table-msg">Aucun participant inscrit</td></tr>';
     }
   });
+}
+
+function chargerDistrictsModal() {
+  const region = document.getElementById('m-region-sel').value;
+  const sel    = document.getElementById('m-district-sel');
+  const hint   = document.getElementById('m-district-hint');
+  sel.innerHTML = '';
+  if (!region) {
+    sel.disabled = true;
+    sel.innerHTML = "<option value=\"\">— Choisir la région d\'abord 'abord —</option>";
+    hint.textContent = "Sélectionnez d'abord une région";
+    return;
+  }
+  const districts = DISTRICTS[region] || [];
+  sel.disabled = false;
+  sel.innerHTML = '<option value="">— Choisir le district —</option>';
+  districts.forEach(d => { const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
+  hint.textContent = districts.length + ' district(s) disponible(s)';
 }
 
 function chargerDistricts() {
@@ -704,13 +744,20 @@ function peuplerListesModal(){
 function ouvrirNouvelUtilisateur() {
   currentRow = -1; // -1 = nouveau
   // Passer les champs en éditable
-  ['m-region','m-district','m-nom'].forEach(id => {
-    const el = document.getElementById(id);
-    el.removeAttribute('readonly');
-    el.style.background = '';
-    el.style.color = '';
-    el.value = '';
-  });
+  // Mode nouveau : afficher selects, cacher inputs readonly
+  document.getElementById('m-region').style.display = 'none';
+  document.getElementById('m-district').style.display = 'none';
+  document.getElementById('m-region-sel').style.display = 'block';
+  document.getElementById('m-region-sel').value = '';
+  document.getElementById('m-district-sel').style.display = 'block';
+  document.getElementById('m-district-sel').innerHTML = '<option value="">— Choisir la région —</option>';
+  document.getElementById('m-district-sel').disabled = true;
+  document.getElementById('m-district-hint').style.display = 'block';
+  document.getElementById('m-district-hint').textContent = "Sélectionnez d'abord une région";
+  document.getElementById('m-nom').removeAttribute('readonly');
+  document.getElementById('m-nom').style.background = '';
+  document.getElementById('m-nom').style.color = '';
+  document.getElementById('m-nom').value = '';
   document.getElementById('m-readonly-label').style.display = 'none';
   ['m-region-req','m-district-req','m-nom-req'].forEach(id => document.getElementById(id).style.display = 'inline');
   document.getElementById('m-email').value = '';
@@ -755,8 +802,8 @@ function sauvegarderBase(){
 
   // --- CAS NOUVEAU UTILISATEUR ---
   if(currentRow===-1){
-    const region=document.getElementById('m-region').value.trim();
-    const district=document.getElementById('m-district').value.trim();
+    const region=document.getElementById('m-region-sel').value.trim();
+    const district=document.getElementById('m-district-sel').value.trim();
     const nom=document.getElementById('m-nom').value.trim();
     if(!region||!district||!nom){showToast('Région, District et Nom sont obligatoires',true);return;}
     const newRow={id:-1,region,district,nom,
