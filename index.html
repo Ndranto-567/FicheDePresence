@@ -332,6 +332,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-heig
     </div>
     <div class="topbar2-right">
       <button class="btn-ed btn-orange" id="btn-missing" onclick="toggleMissing()">⚠ Afficher manquants</button>
+      <button class="btn-ed btn-green2" onclick="ouvrirNouvelUtilisateur()">＋ Ajouter nouveau</button>
       <button class="btn-ed btn-blue" onclick="rechargerBase()">↺ Actualiser</button>
     </div>
   </div>
@@ -363,25 +364,25 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-heig
     </div>
     <div class="modal-body">
       <div class="miss-warn" id="miss-warn" style="display:none;">⚠ Certains champs sont manquants — veuillez les compléter.</div>
-      <div class="m-section">Informations de base <span class="m-readonly">(lecture seule)</span></div>
+      <div class="m-section" id="m-section-base">Informations de base <span class="m-readonly" id="m-readonly-label">(lecture seule)</span></div>
       <div class="m-row-2">
-        <div class="m-form-group"><label>Région</label><input type="text" id="m-region" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
-        <div class="m-form-group"><label>District</label><input type="text" id="m-district" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+        <div class="m-form-group"><label>Région <span id="m-region-req" style="color:#e53e3e;display:none;">*</span></label><input type="text" id="m-region" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+        <div class="m-form-group"><label>District <span id="m-district-req" style="color:#e53e3e;display:none;">*</span></label><input type="text" id="m-district" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
       </div>
-      <div class="m-form-group"><label>Nom et Prénom</label><input type="text" id="m-nom" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
+      <div class="m-form-group"><label>Nom et Prénom <span id="m-nom-req" style="color:#e53e3e;display:none;">*</span></label><input type="text" id="m-nom" readonly style="background:#f3f4f6;color:#6b7280;" /></div>
       <div class="m-row-2">
         <div class="m-form-group"><label>Email</label><input type="email" id="m-email" placeholder="adresse@email.com" /></div>
         <div class="m-form-group"><label>Téléphone</label><input type="text" id="m-tel" placeholder="034 XX XXX XX" /></div>
       </div>
       <div class="m-section">Champs à compléter</div>
       <div class="m-row-2">
-        <div class="m-form-group"><label>Entité</label><select id="m-entite"><option value="">— Choisir —</option></select></div>
-        <div class="m-form-group"><label>Niveau</label><select id="m-niveau"><option value="">— Choisir —</option></select></div>
+        <div class="m-form-group"><label>Entité (col. F)</label><select id="m-entite"><option value="">— Choisir —</option></select></div>
+        <div class="m-form-group"><label>Niveau (col. G)</label><select id="m-niveau"><option value="">— Choisir —</option></select></div>
       </div>
-      <div class="m-form-group"><label>Poste </label><select id="m-poste"><option value="">— Choisir —</option></select></div>
+      <div class="m-form-group"><label>Poste (col. H)</label><select id="m-poste"><option value="">— Choisir —</option></select></div>
       <div class="m-row-2">
-        <div class="m-form-group"><label>Genre</label><select id="m-genre"><option value="">— Choisir —</option></select></div>
-        <div class="m-form-group"><label>Classe d'âge</label><select id="m-age"><option value="">— Choisir —</option></select></div>
+        <div class="m-form-group"><label>Genre (col. I)</label><select id="m-genre"><option value="">— Choisir —</option></select></div>
+        <div class="m-form-group"><label>Classe d'âge (col. J)</label><select id="m-age"><option value="">— Choisir —</option></select></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -398,7 +399,7 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-heig
 
 <script>
 // =====================================================
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5E3eRv71FFt4XK2UqcuSnokHfyCAV0zCbWQloCUcCJ4p7oYelLhw7e2NU-IgdYAmf/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyJVWDUGH7TzZfiYDy7o1_YC5rtmng8KTc9WcmH0Oc_pyX4jyzWYcXRq2_CA6sgCH0/exec";
 // =====================================================
 
 // ---- NAVIGATION ----
@@ -700,6 +701,30 @@ function peuplerListesModal(){
   }
 }
 
+function ouvrirNouvelUtilisateur() {
+  currentRow = -1; // -1 = nouveau
+  // Passer les champs en éditable
+  ['m-region','m-district','m-nom'].forEach(id => {
+    const el = document.getElementById(id);
+    el.removeAttribute('readonly');
+    el.style.background = '';
+    el.style.color = '';
+    el.value = '';
+  });
+  document.getElementById('m-readonly-label').style.display = 'none';
+  ['m-region-req','m-district-req','m-nom-req'].forEach(id => document.getElementById(id).style.display = 'inline');
+  document.getElementById('m-email').value = '';
+  document.getElementById('m-tel').value = '';
+  ['m-entite','m-niveau','m-poste','m-genre','m-age'].forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).classList.remove('field-miss');
+  });
+  document.getElementById('miss-warn').style.display = 'none';
+  document.getElementById('modal-title').textContent = 'Ajouter un nouvel utilisateur';
+  document.getElementById('modal-subtitle').textContent = 'Tous les champs marqués * sont obligatoires';
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
 function ouvrirModal(idx){
   currentRow=idx;
   const r=edAllData[idx];
@@ -727,6 +752,38 @@ function closeModalOnOverlay(e){ if(e.target===document.getElementById('modal-ov
 
 function sauvegarderBase(){
   if(currentRow===null)return;
+
+  // --- CAS NOUVEAU UTILISATEUR ---
+  if(currentRow===-1){
+    const region=document.getElementById('m-region').value.trim();
+    const district=document.getElementById('m-district').value.trim();
+    const nom=document.getElementById('m-nom').value.trim();
+    if(!region||!district||!nom){showToast('Région, District et Nom sont obligatoires',true);return;}
+    const newRow={id:-1,region,district,nom,
+      email:document.getElementById('m-email').value.trim(),
+      tel:document.getElementById('m-tel').value.trim(),
+      entite:document.getElementById('m-entite').value,
+      niveau:document.getElementById('m-niveau').value,
+      poste:document.getElementById('m-poste').value,
+      genre:document.getElementById('m-genre').value,
+      age:document.getElementById('m-age').value
+    };
+    const btn=document.getElementById('btn-save'),spinner=document.getElementById('save-spinner');
+    btn.disabled=true;spinner.style.display='inline-block';
+    const params='action=ajouterUtilisateur&'+Object.entries(newRow).map(([k,v])=>k+'='+encodeURIComponent(v)).join('&');
+    jsonp(GOOGLE_SCRIPT_URL+'?'+params, function(data){
+      btn.disabled=false;spinner.style.display='none';
+      if(data&&data.status==='success'){
+        newRow.id=data.rowId||edAllData.length+2;
+        edAllData.unshift(newRow);
+        closeModal();appliquerFiltresBase();updateStatsBase();
+        showToast('✓ Nouvel utilisateur ajouté');
+      } else showToast("Erreur lors de l'ajout",true);
+    });
+    return;
+  }
+
+  // --- CAS MODIFICATION ---
   const r=edAllData[currentRow];
   const updates={id:r.id,email:document.getElementById('m-email').value.trim(),tel:document.getElementById('m-tel').value.trim(),entite:document.getElementById('m-entite').value,niveau:document.getElementById('m-niveau').value,poste:document.getElementById('m-poste').value,genre:document.getElementById('m-genre').value,age:document.getElementById('m-age').value};
   Object.assign(r,{email:updates.email,tel:updates.tel,entite:updates.entite,niveau:updates.niveau,poste:updates.poste,genre:updates.genre,age:updates.age});
