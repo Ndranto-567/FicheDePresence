@@ -371,15 +371,6 @@ body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; min-heig
           <input type="text" id="m-region" readonly style="background:#f3f4f6;color:#6b7280;" />
           <select id="m-region-sel" style="display:none;" onchange="chargerDistrictsModal()">
             <option value="">— Choisir —</option>
-            <option>Central</option>
-            <option>Analamanga</option><option>Vakinankaratra</option><option>Itasy</option>
-            <option>Bongolava</option><option>Haute Matsiatra</option><option>Amoron'i Mania</option>
-            <option>Vatovavy</option><option>Fitovinany</option><option>Ihorombe</option>
-            <option>Atsimo-Atsinanana</option><option>Atsinanana</option><option>Analanjirofo</option>
-            <option>Alaotra Mangoro</option><option>Boeny</option><option>Sofia</option>
-            <option>Betsiboka</option><option>Melaky</option><option>Atsimo-Andrefana</option>
-            <option>Androy</option><option>Anosy</option><option>Menabe</option>
-            <option>Diana</option><option>Sava</option>
           </select>
         </div>
         <div class="m-form-group">
@@ -526,6 +517,16 @@ function chargerParticipants() {
   });
 }
 
+function peuplerRegionsModal() {
+  // Peupler la liste régions depuis edAllData (valeurs uniques)
+  const sel = document.getElementById('m-region-sel');
+  const currentVal = sel.value;
+  const regions = [...new Set(edAllData.map(r => r.region).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">— Choisir —</option>';
+  regions.forEach(r => { const o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); });
+  if (currentVal) sel.value = currentVal;
+}
+
 function chargerDistrictsModal() {
   const region = document.getElementById('m-region-sel').value;
   const sel    = document.getElementById('m-district-sel');
@@ -533,11 +534,14 @@ function chargerDistrictsModal() {
   sel.innerHTML = '';
   if (!region) {
     sel.disabled = true;
-    sel.innerHTML = "<option value=\"\">— Choisir la région d\'abord 'abord —</option>";
+    sel.innerHTML = "<option value=''>— Choisir la région d'abord —</option>";
     hint.textContent = "Sélectionnez d'abord une région";
     return;
   }
-  const districts = DISTRICTS[region] || [];
+  // Districts depuis edAllData filtrés par région
+  const districts = [...new Set(
+    edAllData.filter(r => r.region === region).map(r => r.district).filter(Boolean)
+  )].sort();
   sel.disabled = false;
   sel.innerHTML = '<option value="">— Choisir le district —</option>';
   districts.forEach(d => { const o=document.createElement('option'); o.value=d; o.textContent=d; sel.appendChild(o); });
@@ -748,6 +752,7 @@ function ouvrirNouvelUtilisateur() {
   document.getElementById('m-region').style.display = 'none';
   document.getElementById('m-district').style.display = 'none';
   document.getElementById('m-region-sel').style.display = 'block';
+  peuplerRegionsModal();
   document.getElementById('m-region-sel').value = '';
   document.getElementById('m-district-sel').style.display = 'block';
   document.getElementById('m-district-sel').innerHTML = '<option value="">— Choisir la région —</option>';
